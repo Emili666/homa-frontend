@@ -1,0 +1,14 @@
+<button
+  type="button"
+  (click)="toggleFavorito($event)"
+  class="boton-favorito"
+  [class.favorito-activo]="esFavorito"
+  [class.loading]="isLoading"
+  [disabled]="isLoading"
+  [title]="esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos'"
+>
+  <i class="fas fa-heart" [class.far]="!esFavorito" [class.fas]="esFavorito"></i>
+  <span *ngIf="showLabel" class="label">
+    {{ esFavorito ? 'Guardado' : 'Guardar' }}
+  </span>
+</button>

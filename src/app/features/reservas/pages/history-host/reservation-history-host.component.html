@@ -1,0 +1,76 @@
+<section class="history-card">
+  <header class="history-card__header">
+    <div>
+      <p class="history-card__eyebrow">Panel de anfitrión</p>
+      <h1 class="history-card__title">Historial de reservas de mis alojamientos</h1>
+      <p class="history-card__subtitle">
+        Consulta el estado de cada reserva, confirma llegadas y haz seguimiento al desempeño de tus propiedades.
+      </p>
+    </div>
+    <button type="button" class="history-card__refresh" (click)="cargarHistorial()">
+      <i class="fas fa-rotate"></i>
+      Actualizar
+    </button>
+  </header>
+
+  <div *ngIf="isLoading" class="history-card__state">
+    <div class="history-card__spinner"></div>
+    <p>Cargando reservas…</p>
+  </div>
+
+  <div *ngIf="error && !isLoading" class="history-card__state history-card__state--error">
+    <p>{{ error }}</p>
+    <button type="button" class="history-card__refresh" (click)="cargarHistorial()">Reintentar</button>
+  </div>
+
+  <div *ngIf="!isLoading && !error && reservas.length === 0" class="history-card__state">
+    <i class="fas fa-folder-open text-3xl text-primary-400"></i>
+    <p>Todavía no tienes reservas registradas como anfitrión.</p>
+    <span>Cuando recibas una, aparecerá aquí con toda la información relevante.</span>
+  </div>
+
+  <div *ngIf="!isLoading && !error && reservas.length > 0" class="history-card__list">
+    <article *ngFor="let reserva of reservas; trackBy: trackByReservaId" class="history-card__item">
+      <div class="history-card__item-header">
+        <div>
+          <p class="history-card__item-label">Alojamiento</p>
+          <h2>{{ reserva.tituloAlojamiento }}</h2>
+          <span class="history-card__location">
+            <i class="fas fa-location-dot"></i>
+            {{ reserva.ciudadAlojamiento }}
+          </span>
+        </div>
+        <span class="history-card__status" [ngClass]="getEstadoClasses(reserva.estado)">
+          {{ getEstadoLabel(reserva.estado) }}
+        </span>
+      </div>
+
+      <div class="history-card__grid">
+        <div>
+          <p class="history-card__item-label">Huésped</p>
+          <strong>{{ reserva.nombreHuesped }}</strong>
+          <span>{{ reserva.emailHuesped || 'Sin correo registrado' }}</span>
+          <span>{{ reserva.telefonoHuesped || 'Sin teléfono' }}</span>
+        </div>
+        <div>
+          <p class="history-card__item-label">Fechas</p>
+          <strong>{{ reserva.fechaEntrada | date: 'longDate' }} → {{ reserva.fechaSalida | date: 'longDate' }}</strong>
+          <span>{{ reserva.cantidadHuespedes }} huésped(es)</span>
+        </div>
+        <div>
+          <p class="history-card__item-label">Ingreso esperado</p>
+          <strong>{{ reserva.precio | currency: 'COP':'symbol':'1.0-0' }}</strong>
+          <span>ID reserva #{{ reserva.id }}</span>
+        </div>
+      </div>
+
+      <footer class="history-card__footer">
+        <span>Creada el {{ reserva.creadoEn | date: 'medium' }}</span>
+        <button type="button" class="history-card__link">
+          Ver detalle completo
+          <i class="fas fa-arrow-up-right-from-square"></i>
+        </button>
+      </footer>
+    </article>
+  </div>
+</section>

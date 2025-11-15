@@ -1,0 +1,15 @@
+<button
+  [attr.type]="type"
+  [disabled]="disabled"
+  (click)="onClick()"
+  class="w-full inline-flex items-center justify-center gap-2 rounded-lg font-semibold px-4 py-2 transition-colors duration-200"
+  [ngClass]="{
+    'bg-blue-600 text-white hover:bg-blue-700': color === 'primary',
+    'bg-fuchsia-600 text-white hover:bg-fuchsia-700': color === 'accent',
+    'bg-red-600 text-white hover:bg-red-700': color === 'warn',
+    'opacity-60 cursor-not-allowed': disabled
+  }"
+>
+  {{ label }}
+  
+</button>

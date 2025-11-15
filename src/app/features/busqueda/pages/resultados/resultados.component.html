@@ -1,0 +1,293 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <!-- Filtros rápidos -->
+      <div class="mt-4 flex items-center space-x-4 overflow-x-auto pb-2">
+        <button
+          (click)="toggleAdvancedSearch()"
+          class="flex items-center space-x-2 px-4 py-2 border rounded-full text-sm font-medium whitespace-nowrap hover:bg-gray-50 transition-colors"
+          [ngClass]="{'bg-blue-600 text-white border-blue-600': showAdvancedSearch}"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <span>Búsqueda avanzada</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform" [ngClass]="{'rotate-180': showAdvancedSearch}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        <button
+          (click)="toggleAmenity('Wifi')"
+          class="px-4 py-2 border rounded-full text-sm font-medium whitespace-nowrap"
+          [ngClass]="{'bg-blue-600 text-white border-blue-600': selectedAmenities.includes('Wifi')}"
+        >
+          <span>Wifi</span>
+        </button>
+
+        <button
+          (click)="toggleAmenity('Piscina')"
+          class="px-4 py-2 border rounded-full text-sm font-medium whitespace-nowrap"
+          [ngClass]="{'bg-blue-600 text-white border-blue-600': selectedAmenities.includes('Piscina')}"
+        >
+          <span>Piscina</span>
+        </button>
+
+        <button
+          (click)="toggleAmenity('Cocina')"
+          class="px-4 py-2 border rounded-full text-sm font-medium whitespace-nowrap"
+          [ngClass]="{'bg-blue-600 text-white border-blue-600': selectedAmenities.includes('Cocina')}"
+        >
+          <span>Cocina</span>
+        </button>
+
+        <button
+          (click)="toggleAmenity('Mascotas permitidas')"
+          class="px-4 py-2 border rounded-full text-sm font-medium whitespace-nowrap"
+          [ngClass]="{'bg-blue-600 text-white border-blue-600': selectedAmenities.includes('Mascotas permitidas')}"
+        >
+          <span>Mascotas</span>
+        </button>
+
+        <button
+          (click)="toggleAmenity('Estacionamiento')"
+          class="px-4 py-2 border rounded-full text-sm font-medium whitespace-nowrap"
+          [ngClass]="{'bg-blue-600 text-white border-blue-600': selectedAmenities.includes('Estacionamiento')}"
+        >
+          <span>Estacionamiento</span>
+        </button>
+      </div>
+
+      <!-- Buscador avanzado -->
+      <div *ngIf="showAdvancedSearch" id="busqueda-avanzada" class="mt-6 bg-blue-50/40 border border-blue-100 rounded-2xl p-4 scroll-mt-20">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">🔍 Búsqueda Avanzada</h3>
+        <p class="text-sm text-gray-600 mb-4">
+          <strong>Búsqueda flexible:</strong> Escribe cualquier letra o palabra de la ciudad (ej: "bog" encuentra "Bogotá", "med" encuentra "Medellín").
+        </p>
+        <div class="grid gap-4 lg:grid-cols-12">
+          <div class="lg:col-span-4">
+            <label class="text-sm font-semibold text-gray-700">Ciudad</label>
+            <div class="relative mt-1">
+              <input 
+                type="text"
+                #citySearch
+                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [value]="cityQuery"
+                (input)="onCityInput(citySearch.value)"
+                (focus)="showCitySuggestions = true"
+                (blur)="hideCitySuggestions()"
+                placeholder="Bogotá, Medellín, Cartagena"
+              >
+              <button
+                *ngIf="cityQuery"
+                type="button"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                (mousedown)="clearCity()"
+              >
+                &times;
+              </button>
+              <ul
+                *ngIf="showCitySuggestions && citySuggestions.length"
+                class="absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-52 overflow-y-auto"
+              >
+                <li
+                  *ngFor="let city of citySuggestions"
+                  (mousedown)="selectCity(city)"
+                  class="px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 cursor-pointer"
+                >
+                  {{city}}
+                </li>
+              </ul>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">
+              Búsqueda predictiva, por ejemplo escribe "Bogotá" y sugiere "Bogotá D.C.".
+            </p>
+          </div>
+          <div class="lg:col-span-2">
+            <label class="text-sm font-semibold text-gray-700">Fecha de llegada</label>
+            <input
+              type="date"
+              class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [(ngModel)]="dateRange.start"
+              (change)="onDateChange('start', dateRange.start)"
+            >
+          </div>
+          <div class="lg:col-span-2">
+            <label class="text-sm font-semibold text-gray-700">Fecha de salida</label>
+            <input
+              type="date"
+              class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [(ngModel)]="dateRange.end"
+              (change)="onDateChange('end', dateRange.end)"
+            >
+          </div>
+          <div class="lg:col-span-3">
+            <label class="text-sm font-semibold text-gray-700">Precio por noche</label>
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+              <span>${{priceRange[0]}}</span>
+              <span>${{priceRange[1]}}</span>
+            </div>
+            <div class="flex flex-col gap-2 mt-2">
+              <input
+                type="range"
+                class="w-full"
+                [min]="minPrice"
+                [max]="maxPrice"
+                [value]="priceRange[0]"
+                #topMinPrice
+                (input)="onPriceInput(0, topMinPrice.value)"
+              >
+              <input
+                type="range"
+                class="w-full"
+                [min]="minPrice"
+                [max]="maxPrice"
+                [value]="priceRange[1]"
+                #topMaxPrice
+                (input)="onPriceInput(1, topMaxPrice.value)"
+              >
+            </div>
+            <p class="text-xs text-gray-500 mt-1">
+              Define tu rango mínimo-máximo (ej. $50 - $200/noche).
+            </p>
+          </div>
+          <div class="lg:col-span-1 flex items-end">
+            <button
+              type="button"
+              (click)="applyFilters()"
+              class="w-full bg-blue-600 text-white font-semibold rounded-xl px-4 py-2 hover:bg-blue-700 transition-colors"
+            >
+              Buscar
+            </button>
+          </div>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-3 text-sm text-gray-700">
+          <span class="font-semibold text-gray-600">Servicios destacados:</span>
+          <label
+            *ngFor="let service of quickServices"
+            class="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-3 py-1 cursor-pointer hover:border-blue-400"
+          >
+            <input
+              type="checkbox"
+              class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+              [checked]="selectedAmenities.includes(service)"
+              (change)="toggleAmenity(service)"
+            >
+            <span>{{service}}</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Contenido principal -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Loading state -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <p class="ml-4 text-gray-600">Cargando alojamientos...</p>
+    </div>
+
+    <!-- Error state -->
+    <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <p><strong>Error:</strong> {{error}}</p>
+      <button (click)="cargarAlojamientos()" class="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+        Reintentar
+      </button>
+    </div>
+
+    <div *ngIf="!isLoading" class="w-full">
+      <!-- Lista de propiedades -->
+        <!-- Ordenar por -->
+        <div class="flex justify-between items-center mb-6">
+          <p class="text-gray-600">
+            <span class="font-medium">{{filteredProperties.length}} alojamientos</span> disponibles
+          </p>
+          <div class="flex items-center">
+            <label for="sort" class="text-sm text-gray-600 mr-2">Ordenar por:</label>
+            <select 
+              id="sort" 
+              [(ngModel)]="selectedSort" 
+              (change)="sortProperties()"
+              class="border rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="recomendados">Recomendados</option>
+              <option value="precio-asc">Precio: menor a mayor</option>
+              <option value="precio-desc">Precio: mayor a menor</option>
+              <option value="mejor-valorados">Mejor valorados</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Mensaje de no resultados -->
+        <div *ngIf="!isLoading && filteredProperties.length === 0" class="text-center py-12 bg-yellow-50 rounded-xl">
+          <p class="text-lg font-semibold text-gray-700">No se encontraron alojamientos con esos filtros</p>
+          <p class="text-sm text-gray-500 mt-2">Intenta ajustar tus criterios de búsqueda</p>
+        </div>
+
+        <!-- Grid de propiedades -->
+        <div *ngIf="!isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
+          <div
+            *ngFor="let alojamiento of filteredProperties"
+            class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+            [routerLink]="['/alojamientos', alojamiento.id]"
+          >
+            <div class="relative">
+              <img
+                [src]="alojamiento.imagenes && alojamiento.imagenes.length > 0 ? alojamiento.imagenes[0] : 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1600&auto=format&fit=crop'"
+                [alt]="alojamiento.titulo"
+                class="w-full h-64 object-cover"
+              >
+              <button
+                (click)="toggleFavorite(alojamiento, $event)"
+                class="absolute top-3 right-3 p-2 bg-white bg-opacity-80 rounded-full"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6"
+                  [class.text-red-500]="alojamiento.esFavorito"
+                  [class.fill-current]="alojamiento.esFavorito"
+                  [class.text-gray-300]="!alojamiento.esFavorito"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div class="p-4">
+              <div class="flex justify-between items-start">
+                <div class="flex-1">
+                  <h3 class="font-semibold text-lg text-gray-900">{{alojamiento.titulo}}</h3>
+                  <p class="text-gray-600 text-sm mt-1">{{alojamiento.ciudad}}</p>
+                  <p class="text-gray-600 text-sm">{{alojamiento.direccion}}</p>
+                  <p class="text-gray-600 text-sm">Hasta {{alojamiento.maxHuespedes}} huéspedes</p>
+                </div>
+                <div class="flex items-center" *ngIf="alojamiento.calificacionPromedio">
+                  <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <span class="ml-1 text-sm text-gray-700">{{alojamiento.calificacionPromedio | number:'1.1-1'}} <span *ngIf="alojamiento.totalResenas">({{alojamiento.totalResenas}})</span></span>
+                </div>
+              </div>
+
+              <div class="mt-4 pt-4 border-t border-gray-100">
+                <p class="text-right">
+                  <span class="font-semibold text-gray-900">${{alojamiento.precioPorNoche | number}}</span>
+                  <span class="text-gray-600"> / noche</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+</div>

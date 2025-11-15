@@ -1,0 +1,54 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- Contenido principal -->
+  <section class="w-full">
+    <header class="mb-4">
+      <h1 class="text-2xl font-bold text-[#17255A]">Alojamientos Disponibles</h1>
+      <p class="text-sm text-gray-600">{{ totalElements }} resultados encontrados</p>
+    </header>
+
+    <!-- Banner/hero -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+      <img class="w-full h-48 object-cover" src="https://images.unsplash.com/photo-1522163182402-834f871fd851?q=80&w=1600&auto=format&fit=crop" alt="map" />
+    </div>
+
+    <!-- Loading state -->
+    <div *ngIf="isLoading" class="text-center py-12">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#17255A]"></div>
+      <p class="mt-4 text-gray-600">Cargando alojamientos...</p>
+    </div>
+
+    <!-- Error state -->
+    <div *ngIf="error && !isLoading" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+      {{ error }}
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!isLoading && !error && alojamientos.length === 0" class="text-center py-12">
+      <p class="text-gray-600 text-lg">No hay alojamientos disponibles en este momento.</p>
+      <p class="text-gray-500 text-sm mt-2">Intenta crear uno desde tu perfil.</p>
+    </div>
+
+    <!-- Grid de cards -->
+    <div *ngIf="!isLoading && alojamientos.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <article *ngFor="let alojamiento of alojamientos" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+        <img
+          [src]="alojamiento.imagenes && alojamiento.imagenes.length > 0 ? alojamiento.imagenes[0] : 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop'"
+          class="w-full h-44 object-cover"
+          [alt]="alojamiento.titulo" />
+        <div class="p-4">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-semibold text-gray-900">{{ alojamiento.titulo }}</h3>
+            <span *ngIf="alojamiento.calificacionPromedio" class="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded-full">
+              {{ alojamiento.calificacionPromedio | number:'1.1-1' }} ★
+            </span>
+          </div>
+          <p class="text-sm text-gray-600 mb-3">{{ alojamiento.ciudad }}</p>
+          <div class="flex items-center justify-between">
+            <div class="text-[#BD1E1E] font-semibold">${{ alojamiento.precioPorNoche }}<span class="text-gray-500 text-sm">/noche</span></div>
+            <a [routerLink]="['/alojamientos', alojamiento.id]" class="text-sm px-3 py-1 rounded-lg bg-[#17255A] text-white hover:bg-[#2A3A6B] transition-colors">Ver</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>

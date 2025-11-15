@@ -1,0 +1,56 @@
+<form
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  class="flex flex-col gap-4 w-full max-w-sm"
+>
+  <app-form-field
+    label="Nombre completo"
+    placeholder="Juan Perez"
+    type="text"
+    [control]="getControl('nombre')"
+  ></app-form-field>
+
+  <app-form-field
+    label="Correo electronico"
+    placeholder="usuario@correo.com"
+    type="email"
+    [control]="getControl('email')"
+  ></app-form-field>
+
+  <app-form-field
+    label="Contrasena"
+    placeholder="Minimo 8 caracteres, 1 mayuscula y 1 numero"
+    type="password"
+    [control]="getControl('password')"
+  ></app-form-field>
+
+  <app-form-field
+    label="Confirmar contrasena"
+    placeholder="Repite tu contrasena"
+    type="password"
+    [control]="getControl('confirmPassword')"
+  ></app-form-field>
+
+  <div class="flex flex-col gap-2">
+    <p class="text-sm font-semibold text-gray-700">Tipo de cuenta</p>
+    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <label
+        *ngFor="let role of roles"
+        class="border rounded-xl p-3 cursor-pointer transition hover:border-primary-500 focus-within:ring-2 focus-within:ring-primary-200"
+        [class.border-primary-500]="getControl('rol')?.value === role.value"
+        [class.bg-primary-50]="getControl('rol')?.value === role.value"
+      >
+        <input
+          type="radio"
+          class="sr-only"
+          formControlName="rol"
+          [value]="role.value"
+        />
+        <span class="block text-sm font-semibold text-gray-900">{{ role.label }}</span>
+        <span class="block text-xs text-gray-500">{{ role.description }}</span>
+      </label>
+    </div>
+  </div>
+
+  <app-button [label]="submitLabel" color="primary" type="submit"></app-button>
+</form>

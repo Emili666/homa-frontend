@@ -1,0 +1,53 @@
+<div class="grid grid-cols-12 gap-6">
+  <section class="col-span-12 lg:col-span-8">
+    <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+      <h2 class="text-lg font-semibold mb-3">Tu viaje</h2>
+      <div class="flex items-center gap-4">
+        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800&auto=format&fit=crop" class="w-28 h-20 object-cover rounded-lg" />
+        <div>
+          <div class="font-medium">Cozy Mountain Retreat with Stunning Views</div>
+          <div class="text-sm text-gray-600">Oct 15 → Oct 18 · 3 guests</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm p-4">
+      <h2 class="text-lg font-semibold mb-3">Guest Details</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <input class="border rounded-lg px-3 py-2" placeholder="First name" />
+        <input class="border rounded-lg px-3 py-2" placeholder="Last name" />
+        <input class="border rounded-lg px-3 py-2 md:col-span-2" placeholder="Email address" />
+        <input class="border rounded-lg px-3 py-2 md:col-span-2" placeholder="Phone number" />
+        <input class="border rounded-lg px-3 py-2 md:col-span-2" placeholder="Any special requests?" />
+      </div>
+    </div>
+
+    <div class="mt-4 flex justify-between">
+      <a routerLink="../fechas" class="px-4 py-2 rounded-lg border">Volver</a>
+      <a routerLink="../pago" class="px-4 py-2 rounded-lg bg-[#17255A] text-white">Continuar a Pago</a>
+    </div>
+  </section>
+
+  <aside class="col-span-12 lg:col-span-4">
+    <div class="bg-[#FAE3C8] rounded-xl p-4">
+      <div class="font-semibold mb-2">Price Breakdown</div>
+      <div class="text-sm text-gray-700 space-y-1">
+        <div class="flex justify-between"><span>$100 × 3 nights</span><span>$300</span></div>
+        <div class="flex justify-between"><span>Taxes & fees</span><span>$30</span></div>
+        <div class="flex justify-between font-semibold border-t pt-2"><span>Total</span><span>$330</span></div>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-4 mt-4">
+      <div class="font-semibold mb-2">Payment Methods</div>
+      <div class="space-y-2">
+        <label class="flex items-center gap-2"><input type="radio" name="pm" checked /> <span>Visa</span></label>
+        <label class="flex items-center gap-2"><input type="radio" name="pm" /> <span>MasterCard</span></label>
+        <label class="flex items-center gap-2"><input type="radio" name="pm" /> <span>PayPal</span></label>
+      </div>
+      <div class="mt-4 flex gap-2">
+        <button class="flex-1 bg-[#BD1E1E] text-white px-4 py-2 rounded-lg">Confirm and Pay</button>
+        <a routerLink="../pago" class="flex-1 px-4 py-2 rounded-lg border">Continue to Payment</a>
+      </div>
+    </div>
+  </aside>
+</div>

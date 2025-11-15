@@ -1,0 +1,79 @@
+.history-card {
+  @apply bg-white shadow-xl rounded-3xl p-8 space-y-8;
+
+  &__header {
+    @apply flex flex-col md:flex-row md:items-center md:justify-between gap-6;
+  }
+
+  &__eyebrow {
+    @apply text-xs uppercase tracking-[0.4em] text-primary-500;
+  }
+
+  &__title {
+    @apply text-2xl md:text-3xl font-bold text-slate-900;
+  }
+
+  &__subtitle {
+    @apply text-slate-500;
+  }
+
+  &__refresh {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition;
+  }
+
+  &__state {
+    @apply flex flex-col items-center justify-center gap-2 text-center bg-slate-50 rounded-2xl py-10 text-slate-500;
+
+    &--error {
+      @apply text-rose-600;
+    }
+  }
+
+  &__spinner {
+    @apply h-10 w-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin;
+  }
+
+  &__list {
+    @apply space-y-6;
+  }
+
+  &__item {
+    @apply border border-slate-100 rounded-2xl p-6 space-y-6 shadow-sm hover:shadow-md transition-shadow;
+  }
+
+  &__item-header {
+    @apply flex flex-col md:flex-row md:items-center md:justify-between gap-3;
+  }
+
+  &__item-label {
+    @apply text-xs uppercase tracking-[0.3em] text-slate-400;
+  }
+
+  &__location {
+    @apply text-sm text-slate-500 inline-flex items-center gap-2;
+  }
+
+  &__status {
+    @apply px-4 py-1.5 rounded-full text-xs font-semibold text-center;
+  }
+
+  &__grid {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+
+    div {
+      @apply space-y-1 text-slate-600;
+
+      strong {
+        @apply text-base text-slate-900;
+      }
+    }
+  }
+
+  &__footer {
+    @apply flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm text-slate-500;
+  }
+
+  &__link {
+    @apply inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-700;
+  }
+}

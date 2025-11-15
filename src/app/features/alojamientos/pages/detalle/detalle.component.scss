@@ -1,0 +1,275 @@
+/* Estilos para el componente de detalle de alojamiento */
+:host {
+  display: block;
+  padding: 2rem 0;
+}
+
+.property-detail {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.property-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.property-info {
+  margin: 2rem 0;
+}
+
+.amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.booking-form {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Estilos para la sección de reseñas */
+.reviews-section {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.review-form {
+  transition: all 0.3s ease;
+}
+
+.star-rating {
+  button:hover svg {
+    transform: scale(1.1);
+  }
+}
+
+.review-card {
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba(249, 250, 251, 0.5);
+  }
+}
+
+.host-response {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Estilos mejorados para estadísticas de reseñas */
+.review-statistics-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 15s ease infinite;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow:
+    0 10px 40px rgba(102, 126, 234, 0.2),
+    0 4px 15px rgba(118, 75, 162, 0.15);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: shine 8s linear infinite;
+  }
+}
+
+.rating-circle {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  box-shadow:
+    0 8px 32px rgba(255, 215, 0, 0.3),
+    inset 0 -2px 10px rgba(255, 215, 0, 0.2);
+  animation: pulse 3s ease-in-out infinite;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffd700, #ffed4e, #ff9500);
+    z-index: -1;
+    animation: rotate 4s linear infinite;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+  }
+}
+
+.rating-bar-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.rating-progress-bg {
+  height: 10px;
+  background: linear-gradient(to right, #e5e7eb, #f3f4f6);
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.rating-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #fbbf24, #f59e0b, #f97316);
+  border-radius: 9999px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    animation: shimmer 2s infinite;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow:
+      0 8px 32px rgba(255, 215, 0, 0.3),
+      inset 0 -2px 10px rgba(255, 215, 0, 0.2);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow:
+      0 12px 40px rgba(255, 215, 0, 0.4),
+      inset 0 -3px 15px rgba(255, 215, 0, 0.3);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shine {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@media (max-width: 768px) {
+  .property-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .star-rating button svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .review-statistics-card {
+    padding: 1.5rem;
+  }
+
+  .rating-circle {
+    width: 120px;
+    height: 120px;
+
+    div {
+      font-size: 3rem;
+    }
+  }
+
+  .rating-bar-item {
+    padding: 0.375rem;
+  }
+}

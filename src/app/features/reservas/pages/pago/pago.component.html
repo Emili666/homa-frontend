@@ -1,0 +1,24 @@
+<div class="grid grid-cols-12 gap-6">
+  <section class="col-span-12 lg:col-span-8 bg-white rounded-xl shadow-sm p-4">
+    <h2 class="text-lg font-semibold mb-3">Payment</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <input class="border rounded-lg px-3 py-2" placeholder="Cardholder Name" />
+      <input class="border rounded-lg px-3 py-2" placeholder="Card Number" />
+      <input class="border rounded-lg px-3 py-2" placeholder="MM/YY" />
+      <input class="border rounded-lg px-3 py-2" placeholder="CVC" />
+      <input class="border rounded-lg px-3 py-2 md:col-span-2" placeholder="Billing Address" />
+    </div>
+    <div class="mt-4 flex justify-between">
+      <a routerLink="../datos" class="px-4 py-2 rounded-lg border">Volver</a>
+      <a routerLink="/" class="px-4 py-2 rounded-lg bg-[#BD1E1E] text-white">Pagar y Finalizar</a>
+    </div>
+  </section>
+  <aside class="col-span-12 lg:col-span-4">
+    <div class="bg-[#FAE3C8] rounded-xl p-4">
+      <div class="font-semibold mb-2">Resumen</div>
+      <div class="text-sm text-gray-700 space-y-1">
+        <div class="flex justify-between"><span>Total</span><span>$330</span></div>
+      </div>
+    </div>
+  </aside>
+</div>

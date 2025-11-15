@@ -1,0 +1,250 @@
+<div class="crear-alojamiento-container">
+  <div class="form-header">
+    <h1><i class="fas fa-home"></i> Crear Nuevo Alojamiento</h1>
+    <p>Completa los detalles de tu propiedad para comenzar a recibir reservas</p>
+  </div>
+
+  <!-- Mensajes de error/éxito -->
+  <div *ngIf="error" class="alert alert-error">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ error }}
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success">
+    <i class="fas fa-check-circle"></i>
+    {{ successMessage }}
+  </div>
+
+  <form [formGroup]="alojamientoForm" (ngSubmit)="onSubmit()" class="alojamiento-form">
+
+    <!-- Información Básica -->
+    <section class="form-section">
+      <h2><i class="fas fa-info-circle"></i> Información Básica</h2>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="titulo">Título del alojamiento <span class="required">*</span></label>
+          <input
+            id="titulo"
+            type="text"
+            formControlName="titulo"
+            class="form-control"
+            [class.invalid]="alojamientoForm.get('titulo')?.invalid && alojamientoForm.get('titulo')?.touched"
+            placeholder="Ej: Apartamento acogedor en el centro"
+          />
+          <small class="form-hint">Mínimo 10 caracteres, máximo 150</small>
+          <small class="error-message" *ngIf="alojamientoForm.get('titulo')?.errors?.['required'] && alojamientoForm.get('titulo')?.touched">
+            El título es obligatorio
+          </small>
+          <small class="error-message" *ngIf="alojamientoForm.get('titulo')?.errors?.['minlength']">
+            El título debe tener al menos 10 caracteres
+          </small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group full-width">
+          <label for="descripcion">Descripción <span class="required">*</span></label>
+          <textarea
+            id="descripcion"
+            formControlName="descripcion"
+            class="form-control textarea"
+            [class.invalid]="alojamientoForm.get('descripcion')?.invalid && alojamientoForm.get('descripcion')?.touched"
+            rows="6"
+            placeholder="Describe tu alojamiento en detalle: características, ubicación, qué hace especial este lugar..."
+          ></textarea>
+          <small class="form-hint">Mínimo 50 caracteres, máximo 2000</small>
+          <small class="error-message" *ngIf="alojamientoForm.get('descripcion')?.errors?.['required'] && alojamientoForm.get('descripcion')?.touched">
+            La descripción es obligatoria
+          </small>
+          <small class="error-message" *ngIf="alojamientoForm.get('descripcion')?.errors?.['minlength']">
+            La descripción debe tener al menos 50 caracteres
+          </small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ubicación -->
+    <section class="form-section">
+      <h2><i class="fas fa-map-marker-alt"></i> Ubicación</h2>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="ciudad">Ciudad <span class="required">*</span></label>
+          <input
+            id="ciudad"
+            type="text"
+            formControlName="ciudad"
+            class="form-control"
+            [class.invalid]="alojamientoForm.get('ciudad')?.invalid && alojamientoForm.get('ciudad')?.touched"
+            placeholder="Ej: Bogotá"
+          />
+          <small class="error-message" *ngIf="alojamientoForm.get('ciudad')?.errors?.['required'] && alojamientoForm.get('ciudad')?.touched">
+            La ciudad es obligatoria
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="direccion">Dirección <span class="required">*</span></label>
+          <input
+            id="direccion"
+            type="text"
+            formControlName="direccion"
+            class="form-control"
+            [class.invalid]="alojamientoForm.get('direccion')?.invalid && alojamientoForm.get('direccion')?.touched"
+            placeholder="Ej: Calle 123 #45-67"
+          />
+          <small class="error-message" *ngIf="alojamientoForm.get('direccion')?.errors?.['required'] && alojamientoForm.get('direccion')?.touched">
+            La dirección es obligatoria
+          </small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="latitud">Latitud <span class="required">*</span></label>
+          <input
+            id="latitud"
+            type="number"
+            step="0.000001"
+            formControlName="latitud"
+            class="form-control"
+            [class.invalid]="alojamientoForm.get('latitud')?.invalid && alojamientoForm.get('latitud')?.touched"
+            placeholder="Ej: 4.710989"
+          />
+          <small class="form-hint">Entre -90 y 90</small>
+          <small class="error-message" *ngIf="alojamientoForm.get('latitud')?.errors?.['required'] && alojamientoForm.get('latitud')?.touched">
+            La latitud es obligatoria
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="longitud">Longitud <span class="required">*</span></label>
+          <input
+            id="longitud"
+            type="number"
+            step="0.000001"
+            formControlName="longitud"
+            class="form-control"
+            [class.invalid]="alojamientoForm.get('longitud')?.invalid && alojamientoForm.get('longitud')?.touched"
+            placeholder="Ej: -74.072092"
+          />
+          <small class="form-hint">Entre -180 y 180</small>
+          <small class="error-message" *ngIf="alojamientoForm.get('longitud')?.errors?.['required'] && alojamientoForm.get('longitud')?.touched">
+            La longitud es obligatoria
+          </small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Detalles del Alojamiento -->
+    <section class="form-section">
+      <h2><i class="fas fa-bed"></i> Detalles del Alojamiento</h2>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="precioPorNoche">Precio por noche (COP) <span class="required">*</span></label>
+          <input
+            id="precioPorNoche"
+            type="number"
+            step="0.01"
+            formControlName="precioPorNoche"
+            class="form-control"
+            [class.invalid]="alojamientoForm.get('precioPorNoche')?.invalid && alojamientoForm.get('precioPorNoche')?.touched"
+            placeholder="Ej: 150000"
+          />
+          <small class="error-message" *ngIf="alojamientoForm.get('precioPorNoche')?.errors?.['required'] && alojamientoForm.get('precioPorNoche')?.touched">
+            El precio es obligatorio
+          </small>
+          <small class="error-message" *ngIf="alojamientoForm.get('precioPorNoche')?.errors?.['min']">
+            El precio debe ser mayor a 0
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="maxHuespedes">Máximo de huéspedes <span class="required">*</span></label>
+          <input
+            id="maxHuespedes"
+            type="number"
+            formControlName="maxHuespedes"
+            class="form-control"
+            [class.invalid]="alojamientoForm.get('maxHuespedes')?.invalid && alojamientoForm.get('maxHuespedes')?.touched"
+            placeholder="Ej: 4"
+          />
+          <small class="error-message" *ngIf="alojamientoForm.get('maxHuespedes')?.errors?.['required'] && alojamientoForm.get('maxHuespedes')?.touched">
+            El número de huéspedes es obligatorio
+          </small>
+          <small class="error-message" *ngIf="alojamientoForm.get('maxHuespedes')?.errors?.['min']">
+            Debe permitir al menos 1 huésped
+          </small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Servicios -->
+    <section class="form-section">
+      <h2><i class="fas fa-concierge-bell"></i> Servicios Disponibles</h2>
+      <p class="section-description">Selecciona los servicios que ofrece tu alojamiento</p>
+
+      <div class="servicios-grid">
+        <div
+          *ngFor="let servicio of serviciosDisponibles"
+          class="servicio-card"
+          [class.selected]="isServicioSelected(servicio.id)"
+          (click)="toggleServicio(servicio.id)"
+        >
+          <i class="fas" [ngClass]="servicio.icon"></i>
+          <span>{{ servicio.label }}</span>
+          <i class="fas fa-check-circle check-icon"></i>
+        </div>
+      </div>
+    </section>
+
+    <!-- Imágenes -->
+    <section class="form-section">
+      <h2><i class="fas fa-images"></i> Imágenes <span class="required">*</span></h2>
+      <p class="section-description">Agrega entre 1 y 10 URLs de imágenes de tu alojamiento</p>
+
+      <div class="imagenes-container" formArrayName="imagenes">
+        <div *ngFor="let imagen of imagenes.controls; let i = index" class="imagen-row">
+          <input
+            [formControlName]="i"
+            type="url"
+            class="form-control"
+            [class.invalid]="imagen.invalid && imagen.touched"
+            placeholder="https://ejemplo.com/imagen.jpg"
+          />
+          <button type="button" class="btn-delete" (click)="eliminarImagen(i)">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="btn-add-imagen"
+        (click)="agregarImagen()"
+        [disabled]="imagenes.length >= 10"
+      >
+        <i class="fas fa-plus"></i>
+        Agregar imagen
+      </button>
+
+      <small class="error-message" *ngIf="imagenes.length === 0 && alojamientoForm.get('imagenes')?.touched">
+        Debes agregar al menos una imagen
+      </small>
+    </section>
+
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="cancel()" [disabled]="isSubmitting">
+        Cancelar
+      </button>
+      <button type="submit" class="btn-submit" [disabled]="isSubmitting || alojamientoForm.invalid">
+        <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
+        <i class="fas fa-save" *ngIf="!isSubmitting"></i>
+        {{ isSubmitting ? 'Creando...' : 'Crear Alojamiento' }}
+      </button>
+    </div>
+  </form>
+</div>

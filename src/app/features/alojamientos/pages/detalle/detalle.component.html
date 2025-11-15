@@ -1,0 +1,686 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error && !isLoading" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+    <p class="text-red-800">{{ error }}</p>
+  </div>
+
+  <!-- Success message -->
+  <div *ngIf="successMessage" class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+    <p class="text-green-800">{{ successMessage }}</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="alojamiento && !isLoading">
+    <!-- Encabezado con botón de volver y editar -->
+    <div class="flex justify-between items-center mb-6">
+      <a routerLink="/perfil" [queryParams]="{section: 'misAlojamientos'}" class="inline-flex items-center text-blue-600 hover:text-blue-800">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+        Volver a mis alojamientos
+      </a>
+
+      <button *ngIf="canEdit && !isEditing"
+              (click)="toggleEditMode()"
+              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+        Editar Alojamiento
+      </button>
+
+      <div *ngIf="isEditing" class="flex gap-2">
+        <button (click)="toggleEditMode()"
+                [disabled]="isSubmitting"
+                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition duration-200 disabled:opacity-50">
+          Cancelar
+        </button>
+        <button (click)="onSubmit()"
+                [disabled]="isSubmitting"
+                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200 disabled:opacity-50">
+          {{ isSubmitting ? 'Guardando...' : 'Guardar Cambios' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Modo de solo lectura -->
+    <div *ngIf="!isEditing">
+      <!-- Galería de imágenes -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8" *ngIf="alojamiento.imagenes.length > 0">
+        <div class="md:col-span-2 row-span-2">
+          <img [src]="alojamiento.imagenes[0]" [alt]="alojamiento.titulo" class="w-full h-full object-cover rounded-l-2xl">
+        </div>
+        <div class="md:col-span-1" *ngIf="alojamiento.imagenes.length > 1">
+          <img [src]="alojamiento.imagenes[1]" [alt]="alojamiento.titulo" class="w-full h-full object-cover">
+        </div>
+        <div class="md:col-span-1" *ngIf="alojamiento.imagenes.length > 2">
+          <img [src]="alojamiento.imagenes[2]" [alt]="alojamiento.titulo" class="w-full h-full object-cover rounded-tr-2xl">
+        </div>
+        <div class="md:col-span-2" *ngIf="alojamiento.imagenes.length > 3">
+          <img [src]="alojamiento.imagenes[3]" [alt]="alojamiento.titulo" class="w-full h-full object-cover rounded-br-2xl">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Sección principal -->
+        <div class="lg:col-span-2">
+          <!-- Título y ubicación -->
+          <div class="border-b border-gray-200 pb-6">
+            <div class="flex justify-between items-start">
+              <div>
+                <h1 class="text-3xl font-bold text-gray-900">{{ alojamiento.titulo }}</h1>
+                <div class="flex items-center mt-2 text-gray-600">
+                  <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                    </svg>
+                    {{ alojamiento.ciudad }} - {{ alojamiento.direccion }}
+                  </span>
+                </div>
+              </div>
+              <app-boton-favorito [alojamientoId]="alojamiento.id" [showLabel]="true"></app-boton-favorito>
+            </div>
+
+            <!-- Características principales -->
+            <div class="mt-4 flex items-center space-x-6 text-sm text-gray-500">
+              <span class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+                ${{ alojamiento.precioPorNoche }} noche
+              </span>
+              <span class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                {{ alojamiento.maxHuespedes }} huésped{{ alojamiento.maxHuespedes > 1 ? 'es' : '' }}
+              </span>
+              <span class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                {{ alojamiento.calificacionPromedio || 'Sin calificar' }}
+              </span>
+            </div>
+
+            <!-- Estado -->
+            <div class="mt-4">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                    [class.bg-yellow-100]="alojamiento.estado === 'PENDIENTE'"
+                    [class.text-yellow-800]="alojamiento.estado === 'PENDIENTE'"
+                    [class.bg-green-100]="alojamiento.estado === 'ACTIVO'"
+                    [class.text-green-800]="alojamiento.estado === 'ACTIVO'"
+                    [class.bg-gray-100]="alojamiento.estado === 'INACTIVO'"
+                    [class.text-gray-800]="alojamiento.estado === 'INACTIVO'">
+                Estado: {{ alojamiento.estado }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Descripción -->
+          <div class="py-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold mb-4">Descripción</h2>
+            <p class="text-gray-600 whitespace-pre-wrap">{{ alojamiento.descripcion }}</p>
+          </div>
+
+          <!-- Comodidades -->
+          <div class="py-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold mb-4">Servicios</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div *ngFor="let servicio of alojamiento.servicios" class="flex items-center">
+                <span class="text-green-500 mr-2">✓</span>
+                <span class="text-gray-700">{{ getServicioLabel(servicio) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ubicación -->
+          <div class="py-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold mb-4">Ubicación</h2>
+            <p class="text-gray-600 mb-2">
+              <strong>Dirección:</strong> {{ alojamiento.direccion }}, {{ alojamiento.ciudad }}
+            </p>
+            <p class="text-gray-600">
+              <strong>Coordenadas:</strong> {{ alojamiento.latitud }}, {{ alojamiento.longitud }}
+            </p>
+          </div>
+
+          <!-- Reseñas -->
+          <div class="py-6">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-xl font-semibold">Reseñas</h2>
+              <button
+                *ngIf="isUserAuthenticated && !mostrarFormularioResena"
+                (click)="toggleFormularioResena()"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
+                Escribir reseña
+              </button>
+            </div>
+
+            <!-- Estadísticas de Reseñas -->
+            <div *ngIf="resenas.length > 0" class="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+              <div class="flex items-center gap-8">
+                <!-- Promedio de calificación -->
+                <div class="flex flex-col items-center">
+                  <div class="text-5xl font-bold text-gray-900">{{ promedioCalificacion }}</div>
+                  <div class="flex items-center mt-2">
+                    <svg *ngFor="let star of [1, 2, 3, 4, 5]"
+                         class="w-5 h-5"
+                         [class.text-yellow-400]="star <= promedioCalificacion"
+                         [class.text-gray-300]="star > promedioCalificacion"
+                         fill="currentColor"
+                         viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  </div>
+                  <p class="text-sm text-gray-500 mt-1">{{ totalResenas }} reseñas</p>
+                </div>
+
+                <!-- Distribución de calificaciones -->
+                <div class="flex-1 space-y-2">
+                  <div *ngFor="let dist of getDistribucionCalificaciones()" class="flex items-center gap-3">
+                    <span class="text-sm text-gray-600 w-12">{{ dist.estrellas }} <svg class="w-4 h-4 inline text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg></span>
+                    <div class="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                      <div class="bg-yellow-400 h-full rounded-full transition-all duration-500"
+                           [style.width.%]="dist.porcentaje"></div>
+                    </div>
+                    <span class="text-sm text-gray-600 w-12 text-right">{{ dist.porcentaje }}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Success message -->
+            <div *ngIf="successResena" class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+              <p class="text-green-800">{{ successResena }}</p>
+            </div>
+
+            <!-- Formulario para crear reseña -->
+            <div *ngIf="mostrarFormularioResena" class="bg-gray-50 rounded-lg p-6 mb-6 border border-gray-200">
+              <h3 class="text-lg font-semibold mb-4">Deja tu reseña</h3>
+              <form [formGroup]="resenaForm" (ngSubmit)="onSubmitResena()" class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Calificación</label>
+                  <div class="flex items-center space-x-2">
+                    <button
+                      *ngFor="let star of [1, 2, 3, 4, 5]"
+                      type="button"
+                      (click)="resenaForm.patchValue({ calificacion: star })"
+                      class="focus:outline-none">
+                      <svg
+                        class="w-8 h-8 transition-colors"
+                        [class.text-yellow-400]="star <= resenaForm.get('calificacion')?.value"
+                        [class.text-gray-300]="star > resenaForm.get('calificacion')?.value"
+                        fill="currentColor"
+                        viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Comentario</label>
+                  <textarea
+                    formControlName="comentario"
+                    rows="4"
+                    placeholder="Comparte tu experiencia..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    [class.border-red-500]="resenaForm.get('comentario')?.invalid && resenaForm.get('comentario')?.touched"
+                  ></textarea>
+                  <p class="mt-1 text-sm text-gray-500">Mínimo 10 caracteres, máximo 500</p>
+                  <p *ngIf="resenaForm.get('comentario')?.invalid && resenaForm.get('comentario')?.touched"
+                     class="mt-1 text-sm text-red-600">
+                    El comentario debe tener entre 10 y 500 caracteres
+                  </p>
+                </div>
+
+                <div *ngIf="errorResena" class="text-red-600 text-sm">
+                  {{ errorResena }}
+                </div>
+
+                <div class="flex gap-2">
+                  <button
+                    type="button"
+                    (click)="toggleFormularioResena()"
+                    [disabled]="isSubmittingResena"
+                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition duration-200 disabled:opacity-50">
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    [disabled]="isSubmittingResena || resenaForm.invalid"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 disabled:opacity-50">
+                    {{ isSubmittingResena ? 'Enviando...' : 'Publicar reseña' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Mensaje para iniciar sesión -->
+            <div *ngIf="!isUserAuthenticated" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <p class="text-blue-800">
+                <a routerLink="/auth/login" class="font-medium hover:underline">Inicia sesión</a> para dejar una reseña
+              </p>
+            </div>
+
+            <!-- Loading state -->
+            <div *ngIf="isLoadingResenas" class="flex justify-center py-8">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+
+            <!-- Lista de reseñas -->
+            <div *ngIf="!isLoadingResenas && resenas.length === 0" class="text-center py-8 text-gray-500">
+              No hay reseñas aún. ¡Sé el primero en dejar una!
+            </div>
+
+            <div *ngIf="!isLoadingResenas && resenas.length > 0" class="space-y-6">
+              <div *ngFor="let resena of resenas" class="border-b border-gray-200 pb-6 last:border-b-0">
+                <div class="flex items-start">
+                  <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-medium overflow-hidden flex-shrink-0">
+                    <img *ngIf="resena.fotoUsuario" [src]="resena.fotoUsuario" [alt]="resena.nombreUsuario" class="w-full h-full object-cover">
+                    <span *ngIf="!resena.fotoUsuario">{{ resena.nombreUsuario.charAt(0).toUpperCase() }}</span>
+                  </div>
+
+                  <div class="ml-4 flex-1">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <h4 class="font-semibold text-gray-900">{{ resena.nombreUsuario }}</h4>
+                        <p class="text-sm text-gray-500">{{ getTimeAgo(resena.creadoEn) }}</p>
+                      </div>
+                      <div class="flex items-center">
+                        <svg
+                          *ngFor="let star of getStars(resena.calificacion)"
+                          class="w-5 h-5"
+                          [class.text-yellow-400]="star === 1"
+                          [class.text-gray-300]="star === 0"
+                          fill="currentColor"
+                          viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    <p class="mt-3 text-gray-700">{{ resena.comentario }}</p>
+
+                    <!-- Respuesta del anfitrión -->
+                    <div *ngIf="resena.mensaje" class="mt-4 bg-gray-50 rounded-lg p-4 border-l-4 border-blue-500">
+                      <p class="text-sm font-semibold text-gray-900 mb-1">Respuesta del anfitrión</p>
+                      <p class="text-sm text-gray-700">{{ resena.mensaje }}</p>
+                      <p class="text-xs text-gray-500 mt-2">{{ getTimeAgo(resena.respondidoEn!) }}</p>
+                    </div>
+
+                    <div *ngIf="puedeResponderResenas" class="mt-4">
+                      <div class="flex flex-wrap items-center gap-3">
+                        <p class="text-sm text-gray-600" *ngIf="!resena.mensaje">
+                          Aún no has respondido a este comentario.
+                        </p>
+                        <button
+                          type="button"
+                          (click)="toggleResponderResena(resena.id)"
+                          class="px-3 py-2 text-sm font-medium rounded-lg border border-blue-200 text-blue-700 hover:bg-blue-50 transition"
+                        >
+                          {{ respuestaActivaId === resena.id ? 'Cerrar respuesta' : (resena.mensaje ? 'Editar respuesta' : 'Responder comentario') }}
+                        </button>
+                      </div>
+
+                      <div *ngIf="respuestaActivaId === resena.id" class="mt-3 bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tu respuesta</label>
+                        <textarea
+                          class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          rows="3"
+                          [(ngModel)]="respuestaDrafts[resena.id]"
+                          [ngModelOptions]="{ standalone: true }"
+                          placeholder="Agradece al huésped, ofrece disculpas si aplica o brinda más contexto..."
+                        ></textarea>
+                        <p *ngIf="respuestaErrores[resena.id]" class="text-sm text-red-600 mt-2">
+                          {{ respuestaErrores[resena.id] }}
+                        </p>
+                        <div class="flex justify-end gap-2 mt-3">
+                          <button
+                            type="button"
+                            (click)="toggleResponderResena(resena.id)"
+                            [disabled]="respondiendoResenaId === resena.id"
+                            class="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            type="button"
+                            (click)="onResponderResena(resena)"
+                            [disabled]="respondiendoResenaId === resena.id"
+                            class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {{ respondiendoResenaId === resena.id ? 'Enviando...' : 'Enviar respuesta' }}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra lateral con reserva -->
+        <div class="lg:col-span-1">
+          <div class="sticky top-4">
+            <!-- Formulario de reserva -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <p class="text-2xl font-bold">${{ alojamiento.precioPorNoche }} <span class="text-base font-normal text-gray-600">noche</span></p>
+                  <div class="flex items-center mt-1">
+                    <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    <span class="ml-1 text-sm text-gray-600">{{ alojamiento.calificacionPromedio || 'Sin calificar' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <form [formGroup]="reservaForm" (ngSubmit)="onReservar()" class="space-y-4">
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Llegada</label>
+                    <input
+                      type="date"
+                      formControlName="fechaEntrada"
+                      [min]="minDate"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      [class.border-red-500]="reservaForm.get('fechaEntrada')?.invalid && reservaForm.get('fechaEntrada')?.touched"
+                    >
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Salida</label>
+                    <input
+                      type="date"
+                      formControlName="fechaSalida"
+                      [min]="reservaForm.get('fechaEntrada')?.value || minDate"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      [class.border-red-500]="reservaForm.get('fechaSalida')?.invalid && reservaForm.get('fechaSalida')?.touched"
+                    >
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Huéspedes</label>
+                  <select
+                    formControlName="cantidadHuespedes"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    [class.border-red-500]="reservaForm.get('cantidadHuespedes')?.invalid && reservaForm.get('cantidadHuespedes')?.touched"
+                  >
+                    <option *ngFor="let n of getHuespedesOptions()" [value]="n">{{ n }} huésped{{ n > 1 ? 'es' : '' }}</option>
+                  </select>
+                </div>
+
+                <div *ngIf="errorReserva" class="text-red-600 text-sm">
+                  {{ errorReserva }}
+                </div>
+
+                <button
+                  type="submit"
+                  [disabled]="isReservando || reservaForm.invalid"
+                  class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium py-3 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {{ isReservando ? 'Procesando...' : 'Reservar ahora' }}
+                </button>
+              </form>
+
+              <p class="mt-4 text-center text-sm text-gray-500">No se cobrará nada por ahora</p>
+
+              <div class="mt-6 space-y-3 text-sm text-gray-600" *ngIf="calcularPrecioTotal() > 0">
+                <div class="flex justify-between">
+                  <span>${{ alojamiento.precioPorNoche }} x {{ calcularNoches() }} noche{{ calcularNoches() > 1 ? 's' : '' }}</span>
+                  <span>${{ calcularPrecioTotal() }}</span>
+                </div>
+                <div class="flex justify-between font-medium text-gray-900 border-t border-gray-200 pt-3 mt-3">
+                  <span>Total</span>
+                  <span>${{ calcularPrecioTotal() }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Información del anfitrión -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 mt-4">
+              <h3 class="text-lg font-semibold mb-4">Anfitrión</h3>
+              <div class="flex items-center">
+                <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-medium overflow-hidden">
+                  <img *ngIf="alojamiento.fotoAnfitrion" [src]="alojamiento.fotoAnfitrion" [alt]="alojamiento.nombreAnfitrion" class="w-full h-full object-cover">
+                  <span *ngIf="!alojamiento.fotoAnfitrion">{{ alojamiento.nombreAnfitrion.charAt(0).toUpperCase() }}</span>
+                </div>
+                <div class="ml-3">
+                  <p class="font-medium">{{ alojamiento.nombreAnfitrion }}</p>
+                  <p class="text-sm text-gray-500" *ngIf="alojamiento.totalResenas">{{ alojamiento.totalResenas }} reseñas</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modo de edición -->
+    <div *ngIf="isEditing">
+      <form [formGroup]="alojamientoForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Información básica -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-xl font-semibold mb-4">Información Básica</h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Título *
+              </label>
+              <input
+                type="text"
+                formControlName="titulo"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [class.border-red-500]="alojamientoForm.get('titulo')?.invalid && alojamientoForm.get('titulo')?.touched"
+              >
+              <p class="mt-1 text-sm text-gray-500">Mínimo 10 caracteres, máximo 150</p>
+              <p *ngIf="alojamientoForm.get('titulo')?.invalid && alojamientoForm.get('titulo')?.touched"
+                 class="mt-1 text-sm text-red-600">
+                El título es requerido (10-150 caracteres)
+              </p>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Descripción *
+              </label>
+              <textarea
+                formControlName="descripcion"
+                rows="6"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [class.border-red-500]="alojamientoForm.get('descripcion')?.invalid && alojamientoForm.get('descripcion')?.touched"
+              ></textarea>
+              <p class="mt-1 text-sm text-gray-500">Mínimo 50 caracteres, máximo 2000</p>
+              <p *ngIf="alojamientoForm.get('descripcion')?.invalid && alojamientoForm.get('descripcion')?.touched"
+                 class="mt-1 text-sm text-red-600">
+                La descripción es requerida (50-2000 caracteres)
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Ciudad *
+              </label>
+              <input
+                type="text"
+                formControlName="ciudad"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [class.border-red-500]="alojamientoForm.get('ciudad')?.invalid && alojamientoForm.get('ciudad')?.touched"
+              >
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Dirección *
+              </label>
+              <input
+                type="text"
+                formControlName="direccion"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [class.border-red-500]="alojamientoForm.get('direccion')?.invalid && alojamientoForm.get('direccion')?.touched"
+              >
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Latitud *
+              </label>
+              <input
+                type="number"
+                step="0.000001"
+                formControlName="latitud"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [class.border-red-500]="alojamientoForm.get('latitud')?.invalid && alojamientoForm.get('latitud')?.touched"
+              >
+              <p class="mt-1 text-sm text-gray-500">Entre -90 y 90</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Longitud *
+              </label>
+              <input
+                type="number"
+                step="0.000001"
+                formControlName="longitud"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [class.border-red-500]="alojamientoForm.get('longitud')?.invalid && alojamientoForm.get('longitud')?.touched"
+              >
+              <p class="mt-1 text-sm text-gray-500">Entre -180 y 180</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Precio por noche * ($)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                formControlName="precioPorNoche"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [class.border-red-500]="alojamientoForm.get('precioPorNoche')?.invalid && alojamientoForm.get('precioPorNoche')?.touched"
+              >
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Máximo de huéspedes *
+              </label>
+              <input
+                type="number"
+                formControlName="maxHuespedes"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [class.border-red-500]="alojamientoForm.get('maxHuespedes')?.invalid && alojamientoForm.get('maxHuespedes')?.touched"
+              >
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Estado *
+              </label>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <button
+                  *ngFor="let estado of estadosDisponibles"
+                  type="button"
+                  (click)="alojamientoForm.patchValue({ estado: estado.key })"
+                  class="relative flex flex-col items-start px-4 py-3 border-2 rounded-lg transition-all"
+                  [class.border-blue-500]="alojamientoForm.get('estado')?.value === estado.key"
+                  [class.bg-blue-50]="alojamientoForm.get('estado')?.value === estado.key"
+                  [class.border-yellow-300]="alojamientoForm.get('estado')?.value !== estado.key && estado.key === 'PENDIENTE'"
+                  [class.bg-yellow-50]="alojamientoForm.get('estado')?.value !== estado.key && estado.key === 'PENDIENTE'"
+                  [class.border-green-300]="alojamientoForm.get('estado')?.value !== estado.key && estado.key === 'ACTIVO'"
+                  [class.bg-green-50]="alojamientoForm.get('estado')?.value !== estado.key && estado.key === 'ACTIVO'"
+                  [class.border-gray-300]="alojamientoForm.get('estado')?.value !== estado.key && estado.key === 'INACTIVO'"
+                  [class.bg-gray-50]="alojamientoForm.get('estado')?.value !== estado.key && estado.key === 'INACTIVO'"
+                >
+                  <span class="font-medium">{{ estado.label }}</span>
+                  <span class="text-sm text-gray-600">{{ estado.description }}</span>
+                  <svg *ngIf="alojamientoForm.get('estado')?.value === estado.key"
+                       class="w-5 h-5 text-blue-600 absolute top-3 right-3"
+                       fill="currentColor"
+                       viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+              <p class="mt-2 text-sm text-gray-600">
+                <strong>ACTIVO:</strong> El alojamiento estará visible para los huéspedes.
+                <strong>INACTIVO:</strong> El alojamiento no será visible pero se mantendrá en el sistema.
+                <strong>PENDIENTE:</strong> En revisión por el administrador.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Servicios -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-xl font-semibold mb-4">Servicios</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <button
+              *ngFor="let servicio of serviciosDisponibles"
+              type="button"
+              (click)="toggleServicio(servicio.key)"
+              class="flex items-center justify-between px-4 py-3 border-2 rounded-lg transition-all"
+              [class.border-blue-500]="isServicioSelected(servicio.key)"
+              [class.bg-blue-50]="isServicioSelected(servicio.key)"
+              [class.border-gray-300]="!isServicioSelected(servicio.key)"
+            >
+              <span>{{ servicio.label }}</span>
+              <svg *ngIf="isServicioSelected(servicio.key)"
+                   class="w-5 h-5 text-blue-600"
+                   fill="currentColor"
+                   viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Imágenes -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-xl font-semibold mb-4">Imágenes (URLs) *</h2>
+          <div formArrayName="imagenes" class="space-y-3">
+            <div *ngFor="let imagen of imagenesArray.controls; let i = index" class="flex gap-2">
+              <input
+                type="url"
+                [formControlName]="i"
+                placeholder="https://ejemplo.com/imagen.jpg"
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [class.border-red-500]="imagen.invalid && imagen.touched"
+              >
+              <button
+                type="button"
+                (click)="removeImagen(i)"
+                [disabled]="imagenesArray.length === 1"
+                class="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+          <button
+            type="button"
+            (click)="addImagen()"
+            [disabled]="imagenesArray.length >= 10"
+            class="mt-4 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Agregar Imagen
+          </button>
+          <p class="mt-2 text-sm text-gray-500">Mínimo 1 imagen, máximo 10</p>
+          <p *ngIf="imagenesArray.invalid && imagenesArray.touched"
+             class="mt-1 text-sm text-red-600">
+            Debes proporcionar al menos una imagen válida
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

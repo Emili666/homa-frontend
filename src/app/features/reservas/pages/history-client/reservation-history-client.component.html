@@ -1,0 +1,72 @@
+<section class="history-client">
+  <header class="history-client__header">
+    <div>
+      <p class="history-client__eyebrow">Tus viajes</p>
+      <h1 class="history-client__title">Historial de reservas</h1>
+      <p class="history-client__subtitle">Aquí encontrarás todas las reservas que realizaste con Homa.</p>
+    </div>
+    <button type="button" class="history-client__refresh" (click)="cargarHistorial()">
+      <i class="fas fa-arrows-rotate"></i>
+      Actualizar
+    </button>
+  </header>
+
+  <div *ngIf="isLoading" class="history-client__state">
+    <div class="history-client__spinner"></div>
+    <p>Cargando tus viajes…</p>
+  </div>
+
+  <div *ngIf="error && !isLoading" class="history-client__state history-client__state--error">
+    <p>{{ error }}</p>
+    <button type="button" class="history-client__refresh" (click)="cargarHistorial()">Reintentar</button>
+  </div>
+
+  <div *ngIf="!isLoading && !error && reservas.length === 0" class="history-client__state">
+    <i class="fas fa-suitcase-rolling text-3xl text-primary-400"></i>
+    <p>Aún no tienes reservas.</p>
+    <span>Cuando confirmes una, la verás aquí con toda la información importante.</span>
+  </div>
+
+  <div *ngIf="!isLoading && !error && reservas.length > 0" class="history-client__list">
+    <article *ngFor="let reserva of reservas; trackBy: trackByReservaId" class="history-client__item">
+      <div class="history-client__item-header">
+        <div>
+          <p class="history-client__item-label">Destino</p>
+          <h2>{{ reserva.tituloAlojamiento }}</h2>
+          <span class="history-client__location">
+            <i class="fas fa-location-dot"></i>
+            {{ reserva.ciudadAlojamiento }}
+          </span>
+        </div>
+        <div class="history-client__status-card">
+          <p class="history-client__status-title">{{ getEstadoTitulo(reserva.estado) }}</p>
+          <p class="history-client__status-helper">{{ getEstadoHelper(reserva.estado) }}</p>
+        </div>
+      </div>
+
+      <div class="history-client__grid">
+        <div>
+          <p class="history-client__item-label">Fechas</p>
+          <strong>{{ reserva.fechaEntrada | date: 'longDate' }} → {{ reserva.fechaSalida | date: 'longDate' }}</strong>
+        </div>
+        <div>
+          <p class="history-client__item-label">Huéspedes</p>
+          <strong>{{ reserva.cantidadHuespedes }}</strong>
+        </div>
+        <div>
+          <p class="history-client__item-label">Total pagado</p>
+          <strong>{{ reserva.precio | currency: 'COP':'symbol':'1.0-0' }}</strong>
+          <span>Reserva #{{ reserva.id }}</span>
+        </div>
+      </div>
+
+      <footer class="history-client__footer">
+        <span>Creada el {{ reserva.creadoEn | date: 'medium' }}</span>
+        <button type="button" class="history-client__link">
+          Necesito ayuda
+          <i class="fas fa-headset"></i>
+        </button>
+      </footer>
+    </article>
+  </div>
+</section>
