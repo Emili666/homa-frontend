@@ -14,7 +14,7 @@ export class LoginPageComponent {
   form: FormGroup;
   error?: string;
   isLoading = false;
-  readonly demoUser = { username: "admin@homa.com", password: "admin123" };
+  readonly demoUser = { username: "demo@correo.com", password: "123456" };
 
   constructor(
     private fb: FormBuilder,

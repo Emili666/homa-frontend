@@ -1,37 +1,53 @@
-# Etapa 1: Build de la aplicación Angular
+# ==============================================================
+# ETAPA 1: Build - Compilar aplicación Angular
+# ==============================================================
 FROM node:18-alpine AS build
 
 WORKDIR /app
 
-# Copiar package.json y package-lock.json
+# Copiar archivos de dependencias
 COPY package*.json ./
 
-# Instalar dependencias
+# Instalar dependencias con npm ci (más confiable que npm install)
 RUN npm ci
 
-# Copiar el código fuente
+# Copiar código fuente
 COPY . .
 
 # Build de producción
 RUN npm run build -- --configuration production
 
-# Etapa 2: Servidor web Nginx
+# ==============================================================
+# ETAPA 2: Runtime - Servir con Nginx
+# ==============================================================
 FROM nginx:alpine
 
-# URL por defecto del backend (se puede sobrescribir con API_BASE_URL)
+# Instalar envsubst para templates dinámicos
+RUN apk add --no-cache gettext
+
+# Variables de ambiente
 ENV API_BASE_URL=http://backend:8080
 
-# Copiar los archivos build de Angular al directorio de Nginx
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --quiet --tries=1 --spider http://localhost/healthz || exit 1
+
+# Copiar archivos compilados de Angular
 COPY --from=build /app/dist/homa-frontend /usr/share/nginx/html
 
-# Copiar plantilla y entrypoint para generar la configuración final de Nginx
+# Copiar configuración de Nginx
 COPY nginx.template.conf /etc/nginx/templates/default.conf.template
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
 
-# Exponer puerto 80
+# Copiar entrypoint script
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+
+# Crear directorio de assets y dar permisos al entrypoint
+RUN chmod +x /docker-entrypoint.sh && \
+    mkdir -p /usr/share/nginx/html/assets
+
+# Exponer puerto
 EXPOSE 80
 
-# Entrypoint y comando por defecto
+# Entrypoint para inyectar variables de ambiente
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
