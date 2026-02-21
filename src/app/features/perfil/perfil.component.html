@@ -256,7 +256,17 @@
                   {{ alojamiento.totalFavoritos || 0 }}
                 </span>
               </div>
-              <div><button class="btn-link" [routerLink]="['/alojamientos', alojamiento.id]">Ver</button></div>
+              <div class="listing-actions">
+                <button class="btn-link" [routerLink]="['/alojamientos', alojamiento.id]">Ver</button>
+                <button
+                  class="btn-link btn-link-danger"
+                  type="button"
+                  [disabled]="isDeletingAlojamiento"
+                  (click)="eliminarAlojamiento(alojamiento.id, alojamiento.titulo)"
+                >
+                  {{ isDeletingAlojamiento ? 'Eliminando...' : 'Eliminar' }}
+                </button>
+              </div>
             </div>
           </div>
           <button class="btn-new-listing" routerLink="/anfitrion">

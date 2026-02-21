@@ -55,6 +55,7 @@ export class AlojamientoService {
     const params = new HttpParams()
       .set("page", page.toString())
       .set("size", size.toString())
+      .set("sort", "creadoEn,desc")
     return this.http.get<PageResponse<Alojamiento>>(`${this.apiUrl}/mios`, { params })
   }
 

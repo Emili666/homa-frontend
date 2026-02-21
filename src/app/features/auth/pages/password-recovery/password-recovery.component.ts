@@ -72,12 +72,12 @@ export class PasswordRecoveryPageComponent implements OnDestroy {
         takeUntil(this.destroy$),
       )
       .subscribe({
-        next: () => {
+        next: (response) => {
           this.codeRequested = true
           this.lastEmailUsed = email
           this.codigoExpiraEn = new Date(Date.now() + 15 * 60 * 1000)
           this.successMessage =
-            "Te enviamos un código de recuperación a tu correo. Revisa la bandeja de entrada o el spam."
+            response?.message ?? "Te enviamos un codigo de recuperacion a tu correo. Revisa la bandeja de entrada o el spam."
           this.errorMessage = undefined
         },
         error: (err) => {
@@ -154,3 +154,6 @@ export class PasswordRecoveryPageComponent implements OnDestroy {
     }
   }
 }
+
+
+

@@ -3,7 +3,7 @@ import { HttpClient } from "@angular/common/http"
 import { BehaviorSubject, type Observable, tap } from "rxjs"
 import { Router } from "@angular/router"
 import { environment } from "@environments/environment"
-import { LoginRequest, LoginResponse, RegistroUsuarioRequest, RolUsuario, Usuario } from "../models/usuario.model"
+import { ApiResponse, LoginRequest, LoginResponse, RegistroUsuarioRequest, RolUsuario, Usuario } from "../models/usuario.model"
 import { ConfigService } from "./config.service"
 
 @Injectable({
@@ -51,8 +51,8 @@ export class AuthService {
     )
   }
 
-  register(data: RegistroUsuarioRequest): Observable<Usuario> {
-    return this.http.post<Usuario>(`${this.usuariosUrl}/registro`, data)
+  register(data: RegistroUsuarioRequest): Observable<ApiResponse<Usuario>> {
+    return this.http.post<ApiResponse<Usuario>>(`${this.usuariosUrl}/registro`, data)
   }
 
   activateAccount(codigo: string): Observable<void> {

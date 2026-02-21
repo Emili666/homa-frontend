@@ -247,4 +247,23 @@
       </button>
     </div>
   </form>
+
+  <div *ngIf="showSuccessOverlay" class="success-overlay">
+    <div class="success-card">
+      <div class="success-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <h3>Alojamiento guardado</h3>
+      <p>Tu alojamiento se creo correctamente y ya aparece en tu panel.</p>
+      <p class="saved-title" *ngIf="createdAlojamientoTitle">"{{ createdAlojamientoTitle }}"</p>
+      <div class="success-actions">
+        <button type="button" class="btn-secondary" (click)="crearOtroAlojamiento()">
+          Crear otro
+        </button>
+        <button type="button" class="btn-primary" (click)="irAMisAlojamientos()">
+          Ver mis alojamientos
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

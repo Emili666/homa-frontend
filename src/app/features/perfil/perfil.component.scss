@@ -512,7 +512,7 @@
 
   .table-header {
     display: grid;
-    grid-template-columns: 2fr 1.2fr 1fr 1fr 0.8fr;
+    grid-template-columns: 2fr 1.2fr 1fr 1fr 0.8fr 1fr;
     padding: 1rem;
     background-color: #f9fafb;
     border-radius: 8px;
@@ -523,7 +523,7 @@
 
   .table-row {
     display: grid;
-    grid-template-columns: 2fr 1.2fr 1fr 1fr 0.8fr;
+    grid-template-columns: 2fr 1.2fr 1fr 1fr 0.8fr 1fr;
     padding: 1rem;
     border-bottom: 1px solid #f3f4f6;
     align-items: center;
@@ -670,6 +670,23 @@
 
   &:hover {
     text-decoration: underline;
+  }
+}
+
+.listing-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-start;
+}
+
+.btn-link-danger {
+  color: #b91c1c;
+
+  &:disabled {
+    color: #9ca3af;
+    cursor: not-allowed;
+    text-decoration: none;
   }
 }
 

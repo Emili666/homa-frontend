@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core"
 import { HttpClient } from "@angular/common/http"
 import type { Observable } from "rxjs"
 import { environment } from "@environments/environment"
-import type { Usuario } from "../models/usuario.model"
+import type { ApiResponse, Usuario } from "../models/usuario.model"
 
 @Injectable({
   providedIn: "root",
@@ -31,8 +31,8 @@ export class UsuarioService {
     })
   }
 
-  recuperarContrasena(email: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/recuperar-contrasena`, { email })
+  recuperarContrasena(email: string): Observable<ApiResponse<void>> {
+    return this.http.post<ApiResponse<void>>(`${this.apiUrl}/recuperar-contrasena`, { email })
   }
 
   restablecerContrasena(codigo: string, nuevaContrasena: string): Observable<void> {

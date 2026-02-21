@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, ChangeDetectorRef } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
 import { Subject } from "rxjs";
 import { finalize, takeUntil } from "rxjs/operators";
@@ -37,6 +38,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
   // Datos de alojamientos reales
   misAlojamientos: Alojamiento[] = [];
   isLoadingAlojamientos = false;
+  isDeletingAlojamiento = false;
   totalAlojamientos = 0;
 
   // Datos de reservas reales
@@ -127,6 +129,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
     private alojamientoService: AlojamientoService,
     private reservaService: ReservaService,
     private favoritoService: FavoritoService,
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
   ) {
     this.personalForm = this.fb.group({
@@ -170,6 +173,11 @@ export class PerfilComponent implements OnInit, OnDestroy {
         this.patchForms(usuario);
       }
     });
+
+    const section = this.route.snapshot.queryParamMap.get("section");
+    if (section) {
+      this.setActiveSection(section);
+    }
 
     this.loadProfile();
   }
@@ -257,11 +265,38 @@ export class PerfilComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (response: PageResponse<Alojamiento>) => {
-          this.misAlojamientos = response.content;
-          this.totalAlojamientos = response.totalElements;
+          this.misAlojamientos = response.content.filter((alojamiento) => alojamiento.estado !== EstadoAlojamiento.ELIMINADO);
+          this.totalAlojamientos = this.misAlojamientos.length;
         },
         error: () => {
           this.error = "No se pudieron cargar tus alojamientos. Intenta nuevamente.";
+        },
+      });
+  }
+
+  eliminarAlojamiento(alojamientoId: number, titulo: string): void {
+    const confirmacion = confirm(`¿Seguro que quieres eliminar "${titulo}"? Esta acción no se puede deshacer.`);
+    if (!confirmacion) {
+      return;
+    }
+
+    this.isDeletingAlojamiento = true;
+    this.error = undefined;
+
+    this.alojamientoService
+      .eliminar(alojamientoId)
+      .pipe(
+        finalize(() => {
+          this.isDeletingAlojamiento = false;
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        next: () => {
+          this.loadMisAlojamientos();
+        },
+        error: (err) => {
+          this.error = err?.error?.message || "No se pudo eliminar el alojamiento. Verifica si tiene reservas futuras.";
         },
       });
   }

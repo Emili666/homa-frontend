@@ -16,6 +16,8 @@ export class AnfitrionComponent implements OnInit, OnDestroy {
   isSubmitting = false;
   error?: string;
   successMessage?: string;
+  showSuccessOverlay = false;
+  createdAlojamientoTitle = '';
 
   // Servicios disponibles
   serviciosDisponibles = [
@@ -118,16 +120,41 @@ export class AnfitrionComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (alojamiento) => {
           this.successMessage = 'Alojamiento creado exitosamente';
-          setTimeout(() => {
-            this.router.navigate(['/perfil'], {
-              queryParams: { section: 'misAlojamientos' }
-            });
-          }, 2000);
+          this.createdAlojamientoTitle = alojamiento?.titulo || this.alojamientoForm.get('titulo')?.value || '';
+          this.showSuccessOverlay = true;
         },
         error: (err) => {
           this.error = err.error?.message || 'No se pudo crear el alojamiento. Intenta nuevamente.';
         }
       });
+  }
+
+  irAMisAlojamientos(): void {
+    this.router.navigate(['/perfil'], {
+      queryParams: { section: 'misAlojamientos' }
+    });
+  }
+
+  crearOtroAlojamiento(): void {
+    this.showSuccessOverlay = false;
+    this.successMessage = undefined;
+    this.createdAlojamientoTitle = '';
+    this.error = undefined;
+    this.alojamientoForm.reset({
+      titulo: '',
+      descripcion: '',
+      ciudad: '',
+      direccion: '',
+      latitud: null,
+      longitud: null,
+      precioPorNoche: null,
+      maxHuespedes: 1,
+      servicios: []
+    });
+    this.imagenes.clear();
+    this.agregarImagen();
+    this.alojamientoForm.markAsPristine();
+    this.alojamientoForm.markAsUntouched();
   }
 
   cancel(): void {

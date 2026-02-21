@@ -49,3 +49,10 @@ export interface LoginResponse {
   refreshToken: string
   usuario: Usuario
 }
+
+export interface ApiResponse<T> {
+  success: boolean
+  message: string
+  data: T
+  timestamp: string
+}

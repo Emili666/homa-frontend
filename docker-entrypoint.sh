@@ -11,7 +11,7 @@ envsubst '$API_BASE_URL' < /etc/nginx/templates/default.conf.template > /etc/ngi
 cat > /usr/share/nginx/html/assets/config.js <<EOF
 // Configuraci?n din?mica inyectada en tiempo de ejecuci?n
 window.__APP_CONFIG__ = {
-  API_URL: "$API_BASE_URL/api"
+  API_URL: "/api"
 };
 console.log("[App Config] API URL set to:", window.__APP_CONFIG__.API_URL);
 EOF

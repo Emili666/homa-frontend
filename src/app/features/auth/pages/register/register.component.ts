@@ -82,9 +82,10 @@ export class RegisterPageComponent implements OnDestroy {
       })
       .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
-        next: () => {
+        next: (response) => {
           this.error = undefined;
-          this.successMessage = "Registro exitoso. Te redirigiremos al inicio de sesion en unos segundos.";
+          this.successMessage =
+            response?.message ?? "Registro exitoso. Te redirigiremos al inicio de sesion en unos segundos.";
           this.redirectTimeoutId = setTimeout(() => {
             this.router.navigate(["/auth/login"]);
           }, 2500);
