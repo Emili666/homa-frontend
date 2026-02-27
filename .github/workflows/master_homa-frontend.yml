@@ -23,21 +23,17 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: npm install and build
+      - name: npm install, build, and test
         run: |
           npm install
           npm run build --if-present
-
-      - name: Prepare deployment package
-        run: |
-          cp azure-server.js dist/homa-frontend/
-          echo '{"name":"homa-frontend-deploy","version":"1.0.0","scripts":{"start":"node azure-server.js"},"dependencies":{"express":"^4.18.2"}}' > dist/homa-frontend/package.json
+          npm run test --if-present
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: dist/homa-frontend
+          path: .
 
   deploy:
     runs-on: ubuntu-latest
@@ -55,9 +51,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_6C86C129118E40E7AB797C8712E7AADF }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_641E000DADC242F2801219102CE7177B }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_FB93036455A143C0B378944D9F8BA529 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B7423FC3BE684C0C920FBF08C3E559EA }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B5323B894481436781E8C30AC319120D }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7F1E317A0C45470B8BC65F25EF3BD127 }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
