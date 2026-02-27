@@ -27,19 +27,17 @@ jobs:
         run: |
           npm install
           npm run build --if-present
-        working-directory: homa-frontend
 
       - name: Prepare deployment package
         run: |
           cp azure-server.js dist/homa-frontend/
           echo '{"name":"homa-frontend-deploy","version":"1.0.0","scripts":{"start":"node azure-server.js"},"dependencies":{"express":"^4.18.2"}}' > dist/homa-frontend/package.json
-        working-directory: homa-frontend
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: homa-frontend/dist/homa-frontend
+          path: dist/homa-frontend
 
   deploy:
     runs-on: ubuntu-latest
