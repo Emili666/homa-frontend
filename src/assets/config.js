@@ -1,13 +1,13 @@
-// ConfiguraciÛn din·mica para la aplicaciÛn Angular
+// Configuraci√≥n din√°mica para la aplicaci√≥n Angular
 // Se ejecuta ANTES de que cargue la app
 
-(function() {
+(function () {
   // Leer API_URL de variables de ambiente o usar default
-  const apiUrl = window.__APP_CONFIG__?.API_URL || "http://localhost:8080/api";
-  
+  const apiUrl = window.__APP_CONFIG__?.API_URL || "http://localhost:8081/api";
+
   // Crear variable global para que Angular la use
   window.__APP_CONFIG__ = window.__APP_CONFIG__ || {};
   window.__APP_CONFIG__.API_URL = apiUrl;
-  
+
   console.log("[App Config] Initialized with API URL:", apiUrl);
 })();

@@ -38,9 +38,17 @@ export class AuthService {
   }
 
   public get isAnfitrion(): boolean {
-    const user = this.currentUserValue
-    const rolNormalizado = (user?.rol ?? "").toString().toUpperCase()
-    return rolNormalizado === RolUsuario.ANFITRION || rolNormalizado === RolUsuario.ADMIN
+    const user = this.currentUserValue;
+    if (!user?.rol) return false;
+    const rol = user.rol.toString().toUpperCase();
+    return rol === "ANFITRION" || rol === "ADMINISTRADOR" || rol === "ADMIN";
+  }
+
+  public get isAdmin(): boolean {
+    const user = this.currentUserValue;
+    if (!user?.rol) return false;
+    const rol = user.rol.toString().toUpperCase();
+    return rol === "ADMINISTRADOR" || rol === "ADMIN";
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {

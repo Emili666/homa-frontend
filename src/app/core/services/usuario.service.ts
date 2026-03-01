@@ -10,7 +10,7 @@ import type { ApiResponse, Usuario } from "../models/usuario.model"
 export class UsuarioService {
   private apiUrl = `${environment.apiUrl}/usuarios`
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   obtenerPerfil(): Observable<Usuario> {
     return this.http.get<Usuario>(`${this.apiUrl}/me`)
@@ -40,5 +40,9 @@ export class UsuarioService {
       codigo,
       nuevaContrasena,
     })
+  }
+
+  getUsuarios(page: number = 0, size: number = 20): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.apiUrl}?page=${page}&size=${size}`)
   }
 }

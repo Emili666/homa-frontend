@@ -1,0 +1,50 @@
+<div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
+  
+  <!-- Sidebar Overlay for Mobile -->
+  <div *ngIf="isMobileSidebarOpen" (click)="toggleMobileSidebar()" 
+       class="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm transition-opacity"></div>
+
+  <!-- Sidebar -->
+  <aside [class.translate-x-0]="isMobileSidebarOpen" [class.-translate-x-full]="!isMobileSidebarOpen"
+         class="fixed lg:static inset-y-0 left-0 w-72 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 z-50 transform lg:translate-x-0 transition-transform duration-300 ease-in-out">
+    <app-sidebar (closeSidebar)="toggleMobileSidebar()" class="h-full"></app-sidebar>
+  </aside>
+  
+  <!-- Content Area -->
+  <div class="flex-1 flex flex-col min-w-0">
+    <!-- Navbar -->
+    <header class="h-16 flex items-center justify-between px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 z-30">
+      <div class="flex items-center">
+        <!-- Hamburger Menu -->
+        <button (click)="toggleMobileSidebar()" class="p-2 mr-4 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg lg:hidden">
+          <span class="material-icons">menu</span>
+        </button>
+        <h2 class="text-xl font-bold bg-gradient-to-r from-primary-600 to-secondary-500 bg-clip-text text-transparent truncate max-w-[200px] sm:max-w-none">
+          Panel de Administración
+        </h2>
+      </div>
+      
+      <!-- Right Actions -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        <!-- Back to site -->
+        <a routerLink="/" class="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-all rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50">
+          <span class="material-icons text-xl">home</span>
+          <span class="hidden md:inline">Ver Sitio</span>
+        </a>
+        
+        <!-- Notifications -->
+        <button class="relative w-10 h-10 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
+          <span class="material-icons">notifications</span>
+          <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-gray-800"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content scrolls independently -->
+    <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8 bg-gray-50 dark:bg-gray-900 scroll-smooth">
+      <div class="max-w-7xl mx-auto">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>

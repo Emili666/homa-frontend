@@ -2,6 +2,7 @@ import { Routes } from "@angular/router";
 import { AuthGuard } from "./core/guards/auth.guard";
 import { RoleGuard } from "./core/guards/role.guard";
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
+import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 
 const routes: Routes = [
   {
@@ -42,6 +43,13 @@ const routes: Routes = [
         data: { roles: ["ANFITRION", "ADMIN"] },
       },
     ]
+  },
+  {
+    path: 'admin',
+    component: AdminLayoutComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ["ADMINISTRADOR", "ADMIN"] },
+    loadChildren: () => import("./features/admin/admin.module").then((m) => m.AdminModule),
   },
   {
     path: "activar-cuenta",

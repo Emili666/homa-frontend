@@ -18,9 +18,9 @@ export interface Usuario {
 }
 
 export enum RolUsuario {
-  HUESPED = "HUESPED",
-  ANFITRION = "ANFITRION",
-  ADMIN = "ADMIN",
+  HUESPED = "Huesped",
+  ANFITRION = "Anfitrion",
+  ADMIN = "Administrador",
 }
 
 export enum EstadoUsuario {

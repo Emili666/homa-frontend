@@ -12,6 +12,7 @@ import { SharedModule } from './shared/shared.module';
 import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { ErrorInterceptor } from './core/interceptors/error.interceptor';
 import { LayoutsModule } from './layouts/layouts.module';
+import { AccessibilityPanelComponent } from './shared/components/accessibility-panel/accessibility-panel.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { LayoutsModule } from './layouts/layouts.module';
     RouterModule.forRoot(routes, { scrollPositionRestoration: 'enabled' }),
     CoreModule,
     SharedModule,
-    LayoutsModule
+    LayoutsModule,
+    AccessibilityPanelComponent
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-main-layout',
@@ -8,14 +9,28 @@ import { Router } from '@angular/router';
 })
 export class MainLayoutComponent {
   searchQuery: string = '';
+  isMenuOpen: boolean = false;
+  currentUser$ = this.authService.currentUser;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    public authService: AuthService
+  ) { }
+
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
 
   onSearch() {
     if (this.searchQuery.trim()) {
-      this.router.navigate(['/buscar'], { 
-        queryParams: { q: this.searchQuery } 
+      this.router.navigate(['/buscar'], {
+        queryParams: { q: this.searchQuery }
       });
     }
+  }
+
+  onLogout() {
+    this.authService.logout();
+    this.router.navigate(['/']);
   }
 }

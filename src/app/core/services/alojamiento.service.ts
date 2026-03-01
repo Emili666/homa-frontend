@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core"
 import { HttpClient, HttpParams } from "@angular/common/http"
 import { Observable } from "rxjs"
 import { environment } from "@environments/environment"
-import  { Alojamiento, AlojamientoRequest, BusquedaAlojamientoParams } from "../models/alojamiento.model"
+import { Alojamiento, AlojamientoRequest, BusquedaAlojamientoParams } from "../models/alojamiento.model"
 
 export interface PageResponse<T> {
   content: T[]
@@ -18,7 +18,7 @@ export interface PageResponse<T> {
 export class AlojamientoService {
   private apiUrl = `${environment.apiUrl}/alojamientos`
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   buscar(params: BusquedaAlojamientoParams): Observable<PageResponse<Alojamiento>> {
     let httpParams = new HttpParams()
@@ -57,6 +57,13 @@ export class AlojamientoService {
       .set("size", size.toString())
       .set("sort", "creadoEn,desc")
     return this.http.get<PageResponse<Alojamiento>>(`${this.apiUrl}/mios`, { params })
+  }
+
+  listarTodos(page: number = 0, size: number = 20): Observable<PageResponse<Alojamiento>> {
+    const params = new HttpParams()
+      .set("page", page.toString())
+      .set("size", size.toString())
+    return this.http.get<PageResponse<Alojamiento>>(this.apiUrl, { params })
   }
 
   subirImagen(id: number, imagen: File): Observable<string> {

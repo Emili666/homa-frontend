@@ -1,0 +1,39 @@
+<div class="h-full flex flex-col bg-white dark:bg-gray-800 shadow-xl lg:shadow-none">
+  <div class="flex items-center justify-between h-16 px-6 border-b border-gray-100 dark:border-gray-700">
+    <a routerLink="/" class="text-xl font-black tracking-tighter text-primary-600 dark:text-primary-400">HOMA <span class="text-gray-400">ADMIN</span></a>
+    <button (click)="closeSidebar.emit()" class="lg:hidden p-2 text-gray-400 hover:text-gray-600 transition">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+  <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+    <a routerLink="/admin/dashboard" routerLinkActive="bg-primary-50 text-primary-600 dark:bg-gray-700 dark:text-white"
+       class="flex items-center px-4 py-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-white transition-all group">
+      <span class="material-icons mr-3 group-hover:scale-110 transition-transform">dashboard</span>
+      <span class="font-medium">Dashboard</span>
+    </a>
+    <a routerLink="/admin/usuarios" routerLinkActive="bg-primary-50 text-primary-600 dark:bg-gray-700 dark:text-white"
+       class="flex items-center px-4 py-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-white transition-all group">
+      <span class="material-icons mr-3 group-hover:scale-110 transition-transform">people</span>
+      <span class="font-medium">Usuarios</span>
+    </a>
+    <a routerLink="/admin/alojamientos" routerLinkActive="bg-primary-50 text-primary-600 dark:bg-gray-700 dark:text-white"
+       class="flex items-center px-4 py-3 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-white transition-all group">
+      <span class="material-icons mr-3 group-hover:scale-110 transition-transform">home_work</span>
+      <span class="font-medium">Alojamientos</span>
+    </a>
+  </nav>
+  <div class="p-4 border-t border-gray-100 dark:border-gray-700">
+    <div class="flex items-center" *ngIf="user$ | async as u">
+      <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center text-white font-bold shadow-md">
+        {{ u.nombre.charAt(0) }}
+      </div>
+      <div class="ml-3 overflow-hidden flex-1">
+        <p class="text-sm font-bold text-gray-700 dark:text-gray-200 truncate">{{ u.nombre }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ u.email }}</p>
+      </div>
+      <button (click)="logout()" class="p-2 text-gray-400 hover:text-red-500 transition" title="Cerrar Sesión">
+        <span class="material-icons">logout</span>
+      </button>
+    </div>
+  </div>
+</div>

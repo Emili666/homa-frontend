@@ -55,7 +55,12 @@ export class LoginPageComponent {
           if (response?.usuario) {
             this.auth.updateCurrentUser(response.usuario);
           }
-          this.router.navigate(["/"]);
+
+          if (this.auth.isAdmin) {
+            this.router.navigate(["/admin/dashboard"]);
+          } else {
+            this.router.navigate(["/"]);
+          }
         },
         error: (err) => {
           const message =

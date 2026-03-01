@@ -9,10 +9,10 @@ export class ConfigService {
   constructor() {
     // Leer de variables de ambiente del navegador
     const envApiUrl = (window as any).__APP_CONFIG__?.API_URL;
-    
+
     // Si no hay variable de ambiente, usar valor por defecto
-    this.apiUrl = envApiUrl || "http://localhost:8080/api";
-    
+    this.apiUrl = envApiUrl || "http://localhost:8081/api";
+
     console.log("[ConfigService] API URL: ", this.apiUrl);
   }
 

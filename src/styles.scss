@@ -16,7 +16,7 @@ $color-gray: #9E9E9E;
 $color-gray-dark: #424242;
 
 // Tipografía
-$font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
 // Espaciado (sistema base 8px)
 $spacing-xs: 4px;
@@ -106,4 +106,51 @@ a {
 .mb-md { margin-bottom: $spacing-md; }
 .mb-lg { margin-bottom: $spacing-lg; }
 .mb-xl { margin-bottom: $spacing-xl; }
-*/
+/* Accessibility Classes */
+body.text-small {
+  font-size: 14px !important;
+}
+
+body.text-medium {
+  font-size: 16px !important;
+}
+
+body.text-large {
+  font-size: 20px !important;
+}
+
+html.high-contrast {
+  filter: contrast(150%) brightness(110%) !important;
+  background-color: #000 !important;
+  color: #fff !important;
+
+  * {
+    border-color: #fff !important;
+    box-shadow: none !important;
+  }
+}
+
+html.grayscale-mode {
+  filter: grayscale(100%) !important;
+}
+
+body.dyslexic-font {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', sans-serif !important;
+}
+
+/* Material Icons fix if needed */
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
