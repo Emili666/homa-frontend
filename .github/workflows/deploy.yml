@@ -30,7 +30,7 @@ jobs:
           aws-region: us-east-2
 
       - name: Deploy to S3
-        run: aws s3 sync dist/homa-frontend/browser s3://homa-frontend-bucket --delete
+        run: aws s3 sync dist/homa-frontend s3://homa-frontend-bucket --delete
 
       - name: Invalidate CloudFront
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
