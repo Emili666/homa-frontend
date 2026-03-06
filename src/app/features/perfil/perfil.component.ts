@@ -188,13 +188,16 @@ export class PerfilComponent implements OnInit, OnDestroy {
   }
 
   get displayName(): string {
-    const { nombre, apellido } = this.personalForm.value;
-    const parts = [nombre, apellido].filter((value) => !!value && value.trim().length > 0);
-    return parts.join(" ") || nombre || "";
+    const { nombre } = this.personalForm.value;
+    const { email } = this.personalForm.value;
+    if (nombre && nombre.trim().length > 0) return nombre;
+    if (this.currentUser?.nombre) return this.currentUser.nombre;
+    if (email) return email.split('@')[0];
+    return "Usuario";
   }
 
   get displayEmail(): string {
-    return this.personalForm.get("email")?.value ?? "";
+    return this.personalForm.get("email")?.value || this.currentUser?.email || "Sin correo";
   }
 
   get isAnfitrion(): boolean {
@@ -205,7 +208,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
       return false;
     }
     const esAnfitrion = user.rol.toString().toUpperCase() === 'ANFITRION' ||
-           user.rol.toString().toUpperCase() === 'ADMIN';
+      user.rol.toString().toUpperCase() === 'ADMIN';
     console.log('Es anfitrion?', esAnfitrion, 'Rol:', user.rol);
     return esAnfitrion;
   }
@@ -642,9 +645,15 @@ export class PerfilComponent implements OnInit, OnDestroy {
     if (this.selectedFile) {
       const formData = new FormData();
       formData.append('foto', this.selectedFile);
-      formData.append('nombre', this.personalForm.value.nombre);
-      formData.append('email', this.personalForm.value.email);
-      formData.append('telefono', this.personalForm.value.telefono || '');
+      if (this.personalForm.value.nombre) {
+        formData.append('nombre', this.personalForm.value.nombre);
+      }
+      if (this.personalForm.value.email) {
+        formData.append('email', this.personalForm.value.email);
+      }
+      if (this.personalForm.value.telefono) {
+        formData.append('telefono', this.personalForm.value.telefono);
+      }
 
       this.usuarioService
         .actualizarPerfilConFoto(formData)

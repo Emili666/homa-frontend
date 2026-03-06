@@ -9,6 +9,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 export class LoginFormComponent {
   @Input() form!: FormGroup;
   @Input() submitLabel = 'Ingresar';
+  @Input() isLoading = false;
   @Output() submitForm = new EventEmitter<void>();
   @Output() forgotPassword = new EventEmitter<void>();
 

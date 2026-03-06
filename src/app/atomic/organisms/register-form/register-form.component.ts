@@ -10,6 +10,7 @@ import { RolUsuario } from '../../../core/models/usuario.model';
 export class RegisterFormComponent {
   @Input() form!: FormGroup;
   @Input() submitLabel = 'Registrarse';
+  @Input() isLoading = false;
   @Output() submitForm = new EventEmitter<void>();
   readonly roles = [
     {

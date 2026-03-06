@@ -1,10 +1,11 @@
 <app-auth-template title="Iniciar Sesión" subtitle="Accede con tus credenciales">
-  <app-login-form
-    [form]="form"
-    (submitForm)="onSubmit()"
-    (forgotPassword)="onForgotPassword()"
-  ></app-login-form>
+  <app-login-form [form]="form" [isLoading]="isLoading" (submitForm)="onSubmit()"
+    (forgotPassword)="onForgotPassword()"></app-login-form>
   <p *ngIf="error" class="mt-3 text-sm text-red-600">{{ error }}</p>
+
+  <div class="mt-4 flex justify-center">
+    <ngx-turnstile [siteKey]="siteKey" (resolved)="onCaptchaResolved($event)"></ngx-turnstile>
+  </div>
   <div class="mt-4 flex flex-col gap-3">
     <div class="text-center">
       <span class="text-sm text-gray-600">¿No tienes una cuenta? </span>

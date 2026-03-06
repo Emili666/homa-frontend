@@ -10,10 +10,11 @@ export class ButtonComponent {
   @Input() color: 'primary' | 'accent' | 'warn' = 'primary';
   @Input() type: 'button' | 'submit' | 'reset' = 'button';
   @Input() disabled = false;
+  @Input() isLoading = false;
   @Input() icon?: string;
   @Output() clicked = new EventEmitter<void>();
 
   onClick(): void {
-    if (!this.disabled) this.clicked.emit();
+    if (!this.disabled && !this.isLoading) this.clicked.emit();
   }
 }

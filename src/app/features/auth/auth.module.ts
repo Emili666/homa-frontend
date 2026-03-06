@@ -8,6 +8,7 @@ import { AtomicModule } from '../../atomic/atomic.module';
 import { LoginPageComponent } from './pages/login/login.component';
 import { RegisterPageComponent } from './pages/register/register.component';
 import { PasswordRecoveryPageComponent } from './pages/password-recovery/password-recovery.component';
+import { NgxTurnstileModule } from 'ngx-turnstile';
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import { PasswordRecoveryPageComponent } from './pages/password-recovery/passwor
     CommonModule,
     AuthRoutingModule,
     ReactiveFormsModule,
-    AtomicModule
+    AtomicModule,
+    NgxTurnstileModule
   ]
 })
 export class AuthModule { }

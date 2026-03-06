@@ -16,6 +16,8 @@ export class RegisterPageComponent implements OnDestroy {
   error?: string;
   successMessage?: string;
   isLoading = false;
+  siteKey = '1x00000000000000000000AA'; // Dummy testing key
+  captchaToken: string | null = null;
   private redirectTimeoutId?: ReturnType<typeof setTimeout>;
 
   constructor(
@@ -55,6 +57,11 @@ export class RegisterPageComponent implements OnDestroy {
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      return;
+    }
+
+    if (!this.captchaToken) {
+      this.error = "Por favor, completa el Captcha de seguridad.";
       return;
     }
 
@@ -102,6 +109,11 @@ export class RegisterPageComponent implements OnDestroy {
   goToLogin(): void {
     this.clearRedirectTimeout();
     this.router.navigate(["/auth/login"]);
+  }
+
+  onCaptchaResolved(token: string) {
+    this.captchaToken = token;
+    this.error = undefined;
   }
 
   private mapRolToApi(rol: RolUsuario): "Huesped" | "Anfitrion" {

@@ -14,6 +14,8 @@ export class LoginPageComponent {
   form: FormGroup;
   error?: string;
   isLoading = false;
+  siteKey = '1x00000000000000000000AA'; // Dummy testing key
+  captchaToken: string | null = null;
   readonly demoUser = { username: "demo@correo.com", password: "123456" };
 
   constructor(
@@ -30,6 +32,11 @@ export class LoginPageComponent {
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      return;
+    }
+
+    if (!this.captchaToken) {
+      this.error = "Por favor, completa el Captcha de seguridad.";
       return;
     }
 
@@ -63,6 +70,11 @@ export class LoginPageComponent {
           this.error = message;
         },
       });
+  }
+
+  onCaptchaResolved(token: string) {
+    this.captchaToken = token;
+    this.error = undefined;
   }
 
   onForgotPassword(): void {

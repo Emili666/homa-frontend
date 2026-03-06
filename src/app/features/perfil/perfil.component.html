@@ -119,8 +119,21 @@
       </div>
     </div>
 
-    <div *ngIf="isLoading" class="loading-message">
-      Cargando informacion del perfil...
+    <!-- Skeletal Loading State (HCI Enhancement) -->
+    <div *ngIf="isLoading" class="skeleton-wrapper">
+      <div class="content-grid">
+        <section class="profile-info-card" style="padding: 2rem;">
+          <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+            <div class="skeleton-box skeleton-avatar" style="width: 100px; height: 100px; margin-right: 1.5rem;"></div>
+            <div style="flex: 1;">
+              <div class="skeleton-box skeleton-text medium"></div>
+              <div class="skeleton-box skeleton-text short"></div>
+            </div>
+          </div>
+          <div class="skeleton-box skeleton-text"></div>
+          <div class="skeleton-box skeleton-text"></div>
+        </section>
+      </div>
     </div>
 
     <ng-container *ngIf="!error && !isLoading; else errorTemplate">

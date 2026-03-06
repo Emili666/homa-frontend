@@ -11,4 +11,10 @@ export class InputComponent {
   @Input() type = 'text';
   @Input() control!: FormControl;
   @Input() icon?: string;
+
+  showPassword = false;
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
 }
