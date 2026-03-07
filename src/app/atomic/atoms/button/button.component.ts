@@ -7,13 +7,19 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class ButtonComponent {
   @Input() label = 'Enviar';
+  @Input() loadingLabel = 'Cargando...';
   @Input() color: 'primary' | 'accent' | 'warn' = 'primary';
   @Input() type: 'button' | 'submit' | 'reset' = 'button';
   @Input() disabled = false;
+  @Input() loading = false;
   @Input() icon?: string;
   @Output() clicked = new EventEmitter<void>();
 
+  get isDisabled(): boolean {
+    return this.disabled || this.loading;
+  }
+
   onClick(): void {
-    if (!this.disabled) this.clicked.emit();
+    if (!this.isDisabled) this.clicked.emit();
   }
 }

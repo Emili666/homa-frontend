@@ -5,28 +5,64 @@
 >
   <app-form-field
     label="Nombre completo"
-    placeholder="Juan Perez"
+    placeholder="Juan Pérez"
     type="text"
     [control]="getControl('nombre')"
   ></app-form-field>
 
   <app-form-field
-    label="Correo electronico"
+    label="Correo electrónico"
     placeholder="usuario@correo.com"
     type="email"
     [control]="getControl('email')"
   ></app-form-field>
 
-  <app-form-field
-    label="Contrasena"
-    placeholder="Minimo 8 caracteres, 1 mayuscula y 1 numero"
-    type="password"
-    [control]="getControl('password')"
-  ></app-form-field>
+  <!-- Campo contraseña con indicador de fortaleza -->
+  <div>
+    <app-form-field
+      label="Contraseña"
+      placeholder="Mín. 8 caracteres, 1 mayúscula y 1 número"
+      type="password"
+      [control]="getControl('password')"
+    ></app-form-field>
+
+    <!-- Barra de fortaleza de contraseña -->
+    <div *ngIf="getControl('password')?.value" class="mt-2">
+      <div class="flex gap-1 h-1.5 mb-1">
+        <div class="flex-1 rounded-full transition-colors duration-300"
+          [ngClass]="passwordStrength >= 1 ? passwordStrengthBarClass : 'bg-gray-200'"></div>
+        <div class="flex-1 rounded-full transition-colors duration-300"
+          [ngClass]="passwordStrength >= 2 ? passwordStrengthBarClass : 'bg-gray-200'"></div>
+        <div class="flex-1 rounded-full transition-colors duration-300"
+          [ngClass]="passwordStrength >= 3 ? passwordStrengthBarClass : 'bg-gray-200'"></div>
+        <div class="flex-1 rounded-full transition-colors duration-300"
+          [ngClass]="passwordStrength >= 4 ? passwordStrengthBarClass : 'bg-gray-200'"></div>
+      </div>
+      <p class="text-xs font-medium" [ngClass]="passwordStrengthClass">
+        Contraseña {{ passwordStrengthLabel }}
+      </p>
+    </div>
+
+    <!-- Requisitos de contraseña -->
+    <ul class="mt-2 space-y-0.5 text-xs text-gray-500">
+      <li [class.text-green-600]="getControl('password')?.value?.length >= 8">
+        <span class="mr-1">{{ getControl('password')?.value?.length >= 8 ? '✓' : '○' }}</span>
+        Al menos 8 caracteres
+      </li>
+      <li [class.text-green-600]="/[A-Z]/.test(getControl('password')?.value || '')">
+        <span class="mr-1">{{ /[A-Z]/.test(getControl('password')?.value || '') ? '✓' : '○' }}</span>
+        Una letra mayúscula
+      </li>
+      <li [class.text-green-600]="/[0-9]/.test(getControl('password')?.value || '')">
+        <span class="mr-1">{{ /[0-9]/.test(getControl('password')?.value || '') ? '✓' : '○' }}</span>
+        Un número
+      </li>
+    </ul>
+  </div>
 
   <app-form-field
-    label="Confirmar contrasena"
-    placeholder="Repite tu contrasena"
+    label="Confirmar contraseña"
+    placeholder="Repite tu contraseña"
     type="password"
     [control]="getControl('confirmPassword')"
   ></app-form-field>
@@ -36,9 +72,9 @@
     <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
       <label
         *ngFor="let role of roles"
-        class="border rounded-xl p-3 cursor-pointer transition hover:border-primary-500 focus-within:ring-2 focus-within:ring-primary-200"
-        [class.border-primary-500]="getControl('rol')?.value === role.value"
-        [class.bg-primary-50]="getControl('rol')?.value === role.value"
+        class="border rounded-xl p-3 cursor-pointer transition hover:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200"
+        [class.border-blue-500]="getControl('rol')?.value === role.value"
+        [class.bg-blue-50]="getControl('rol')?.value === role.value"
       >
         <input
           type="radio"
@@ -52,5 +88,11 @@
     </div>
   </div>
 
-  <app-button [label]="submitLabel" color="primary" type="submit"></app-button>
+  <app-button
+    [label]="submitLabel"
+    loadingLabel="Creando cuenta..."
+    [loading]="loading"
+    color="primary"
+    type="submit"
+  ></app-button>
 </form>

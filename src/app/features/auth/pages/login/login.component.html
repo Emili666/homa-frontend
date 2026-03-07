@@ -1,6 +1,7 @@
 <app-auth-template title="Iniciar Sesión" subtitle="Accede con tus credenciales">
   <app-login-form
     [form]="form"
+    [loading]="isLoading"
     (submitForm)="onSubmit()"
     (forgotPassword)="onForgotPassword()"
   ></app-login-form>

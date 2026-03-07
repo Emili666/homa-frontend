@@ -1,11 +1,39 @@
-<div class="w-full">
+<div class="w-full relative">
   <input
     class="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    [class.border-red-400]="control?.invalid && control?.touched"
+    [class.pr-10]="type === 'password'"
     [attr.placeholder]="placeholder"
-    [type]="type"
+    [type]="effectiveType"
     [formControl]="control"
   />
-  <p class="mt-1 text-sm text-red-600" *ngIf="control?.invalid && control?.touched">
-    Campo inválido
-  </p>
+  <!-- Botón ojo para contraseñas -->
+  <button
+    *ngIf="type === 'password'"
+    type="button"
+    (click)="togglePassword()"
+    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 focus:outline-none"
+    [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+  >
+    <span class="material-icons text-lg">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+  </button>
+
+  <!-- Mensajes de error específicos -->
+  <ng-container *ngIf="control?.invalid && control?.touched">
+    <p class="mt-1 text-xs text-red-600" *ngIf="control.errors?.['required']">Este campo es obligatorio.</p>
+    <p class="mt-1 text-xs text-red-600" *ngIf="control.errors?.['email']">Ingresa un correo electrónico válido.</p>
+    <p class="mt-1 text-xs text-red-600" *ngIf="control.errors?.['minlength']">
+      Mínimo {{ control.errors?.['minlength']?.requiredLength }} caracteres.
+    </p>
+    <p class="mt-1 text-xs text-red-600" *ngIf="control.errors?.['maxlength']">
+      Máximo {{ control.errors?.['maxlength']?.requiredLength }} caracteres.
+    </p>
+    <p class="mt-1 text-xs text-red-600" *ngIf="control.errors?.['pattern']">
+      Debe tener al menos una letra mayúscula y un número.
+    </p>
+    <p class="mt-1 text-xs text-red-600"
+       *ngIf="!control.errors?.['required'] && !control.errors?.['email'] && !control.errors?.['minlength'] && !control.errors?.['maxlength'] && !control.errors?.['pattern']">
+      Campo inválido.
+    </p>
+  </ng-container>
 </div>

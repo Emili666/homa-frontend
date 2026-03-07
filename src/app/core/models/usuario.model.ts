@@ -1,31 +1,31 @@
+/**
+ * Modelo que coincide EXACTAMENTE con UsuarioResponse.java del backend
+ * Campos: id, nombre, email, telefono, foto, fechaNacimiento, estado, rol, esAnfitrion, creadoEn
+ */
 export interface Usuario {
   id: number
   nombre: string
-  apellido?: string
   email: string
   telefono?: string
-  direccion?: string
-  fotoUrl?: string
-  rol: RolUsuario
+  foto?: string          // ← backend envía 'foto', NO 'fotoUrl'
+  fechaNacimiento?: string
   estado: EstadoUsuario
-  fechaRegistro: Date
-  idiomaPreferido?: string
-  monedaPreferida?: string
-  zonaHoraria?: string
-  notificacionesEmail?: boolean
-  notificacionesPush?: boolean
-  recibirOfertas?: boolean
+  rol: RolUsuario
+  esAnfitrion?: boolean
+  creadoEn?: string
 }
 
 export enum RolUsuario {
   HUESPED = "Huesped",
   ANFITRION = "Anfitrion",
   ADMIN = "Administrador",
+  ADMINISTRADOR = "Administrador",   // alias para el backend que lo manda como Administrador
 }
 
 export enum EstadoUsuario {
   ACTIVO = "ACTIVO",
   INACTIVO = "INACTIVO",
+  ELIMINADO = "ELIMINADO",
   PENDIENTE_ACTIVACION = "PENDIENTE_ACTIVACION",
 }
 
@@ -46,7 +46,10 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   token: string
-  refreshToken: string
+  tipo: string
+  email: string
+  nombre: string
+  rol: string
   usuario: Usuario
 }
 

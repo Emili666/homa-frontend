@@ -120,10 +120,16 @@
     </div>
 
     <div *ngIf="isLoading" class="loading-message">
-      Cargando informacion del perfil...
+      Cargando información del perfil...
     </div>
 
-    <ng-container *ngIf="!error && !isLoading; else errorTemplate">
+    <!-- Error del perfil (solo si no hay datos en caché) -->
+    <div *ngIf="profileError && !isLoading" class="error-card" style="margin-bottom: 1rem;">
+      <p>{{ profileError }}</p>
+      <button class="btn-retry" (click)="loadProfile()">Reintentar</button>
+    </div>
+
+    <ng-container>
       <!-- Mi Perfil -->
       <div class="content-grid" *ngIf="activeSection === 'myProfile'">
         <!-- Profile Info Section -->
@@ -317,8 +323,14 @@
           <p>Cargando reservas...</p>
         </div>
 
+        <!-- Error de reservas -->
+        <div *ngIf="reservasError" class="error-card" style="margin-bottom: 1rem;">
+          <p>{{ reservasError }}</p>
+          <button class="btn-retry" (click)="loadMisReservas()">Reintentar</button>
+        </div>
+
         <!-- Reservas -->
-        <div *ngIf="!isLoadingReservas && misReservas.length > 0" class="reservas-grid">
+        <div *ngIf="!isLoadingReservas && !reservasError && misReservas.length > 0" class="reservas-grid">
           <div *ngFor="let reserva of misReservas" class="reserva-card">
             <div class="reserva-header">
               <h3>{{ reserva.tituloAlojamiento }}</h3>
@@ -359,7 +371,7 @@
         </div>
 
         <!-- Sin reservas -->
-        <div *ngIf="!isLoadingReservas && misReservas.length === 0" class="empty-state">
+        <div *ngIf="!isLoadingReservas && !reservasError && misReservas.length === 0" class="empty-state">
           <i class="fas fa-calendar-times"></i>
           <h3>No tienes reservas</h3>
           <p>Explora nuestros alojamientos y haz tu primera reserva</p>
@@ -774,12 +786,11 @@
       </div>
     </ng-container>
 
-    <ng-template #errorTemplate>
-      <div class="error-card">
-        <p>{{ error }}</p>
-        <button class="btn-retry" (click)="loadProfile()">Reintentar</button>
-      </div>
-    </ng-template>
+    <!-- Error retry global solo para errores de sistema -->
+    <div *ngIf="error" class="error-card" style="margin-top: 1rem;">
+      <p>{{ error }}</p>
+      <button class="btn-retry" (click)="loadProfile()">Reintentar</button>
+    </div>
   </main>
 </div>
 

@@ -25,6 +25,9 @@ export class PerfilComponent implements OnInit, OnDestroy {
   cambioContrasenaForm: FormGroup;
   isLoading = false;
   error?: string;
+  profileError?: string;       // Error solo del perfil, no bloquea otras secciones
+  reservasError?: string;      // Error de reservas
+  alojamientosError?: string;  // Error de alojamientos
   isEditMode = false;
   isSaving = false;
   selectedFile: File | null = null;
@@ -205,7 +208,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
       return false;
     }
     const esAnfitrion = user.rol.toString().toUpperCase() === 'ANFITRION' ||
-           user.rol.toString().toUpperCase() === 'ADMIN';
+      user.rol.toString().toUpperCase() === 'ADMIN';
     console.log('Es anfitrion?', esAnfitrion, 'Rol:', user.rol);
     return esAnfitrion;
   }
@@ -230,7 +233,13 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   loadProfile(): void {
     this.isLoading = true;
-    this.error = undefined;
+    this.profileError = undefined;
+
+    // Intentar usar datos del cache local primero para carga rápida
+    const cached = this.authService.currentUserValue;
+    if (cached) {
+      this.patchForms(cached);
+    }
 
     this.usuarioService
       .obtenerPerfil()
@@ -244,16 +253,23 @@ export class PerfilComponent implements OnInit, OnDestroy {
         next: (usuario) => {
           this.patchForms(usuario);
           this.authService.updateCurrentUser(usuario);
+          this.profileError = undefined;
         },
-        error: () => {
-          this.error = "No se pudo cargar la informacion del perfil. Intenta nuevamente.";
+        error: (err) => {
+          // No seteamos this.error global para no bloquear TODO el perfil
+          // Si tenemos datos del cache, los mostramos igualmente
+          const msg = err?.error?.message || err?.message || 'Error al cargar el perfil';
+          console.warn('[Perfil] Error al cargar desde backend:', msg);
+          if (!cached) {
+            this.profileError = "No se pudo cargar la información del perfil.";
+          }
         },
       });
   }
 
   loadMisAlojamientos(page: number = 0, size: number = 10): void {
     this.isLoadingAlojamientos = true;
-    this.error = undefined;
+    this.alojamientosError = undefined;
 
     this.alojamientoService
       .obtenerMisAlojamientos(page, size)
@@ -267,9 +283,12 @@ export class PerfilComponent implements OnInit, OnDestroy {
         next: (response: PageResponse<Alojamiento>) => {
           this.misAlojamientos = response.content.filter((alojamiento) => alojamiento.estado !== EstadoAlojamiento.ELIMINADO);
           this.totalAlojamientos = this.misAlojamientos.length;
+          this.alojamientosError = undefined;
         },
-        error: () => {
-          this.error = "No se pudieron cargar tus alojamientos. Intenta nuevamente.";
+        error: (err) => {
+          const msg = err?.error?.message || err?.message || 'Error';
+          console.error('[Perfil] Error al cargar alojamientos:', msg);
+          this.alojamientosError = "No se pudieron cargar tus alojamientos.";
         },
       });
   }
@@ -350,7 +369,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   loadMisReservas(): void {
     this.isLoadingReservas = true;
-    this.error = undefined;
+    this.reservasError = undefined;
 
     this.reservaService
       .obtenerMisReservas()
@@ -363,9 +382,12 @@ export class PerfilComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (reservas: Reserva[]) => {
           this.misReservas = reservas;
+          this.reservasError = undefined;
         },
-        error: () => {
-          this.error = "No se pudieron cargar tus reservas. Intenta nuevamente.";
+        error: (err) => {
+          const msg = err?.error?.message || err?.message || 'Error';
+          console.error('[Perfil] Error al cargar reservas:', msg);
+          this.reservasError = "No se pudieron cargar tus reservas. Intenta nuevamente.";
         },
       });
   }
@@ -692,23 +714,32 @@ export class PerfilComponent implements OnInit, OnDestroy {
   }
 
   private patchForms(usuario: Usuario): void {
+    // Solo patcheamos campos que el backend realmente devuelve en UsuarioResponse
+    // (id, nombre, email, telefono, foto, fechaNacimiento, estado, rol, esAnfitrion, creadoEn)
     this.personalForm.patchValue({
       nombre: usuario.nombre ?? "",
       email: usuario.email ?? "",
       telefono: usuario.telefono ?? "",
     });
 
+    // Los formularios de preferencias y notificaciones no tienen datos reales del backend
+    // Se mantienen con valores por defecto para no romper el template
     this.preferenciasForm.patchValue({
-      idiomaPreferido: usuario.idiomaPreferido ?? "",
-      monedaPreferida: usuario.monedaPreferida ?? "",
-      zonaHoraria: usuario.zonaHoraria ?? "",
+      idiomaPreferido: "",
+      monedaPreferida: "",
+      zonaHoraria: "",
     });
 
     this.notificacionesForm.patchValue({
-      notificacionesEmail: usuario.notificacionesEmail ?? false,
-      notificacionesPush: usuario.notificacionesPush ?? false,
-      recibirOfertas: usuario.recibirOfertas ?? false,
+      notificacionesEmail: false,
+      notificacionesPush: false,
+      recibirOfertas: false,
     });
+
+    // Actualizar foto de perfil si existe
+    if (usuario.foto) {
+      this.previewUrl = usuario.foto;
+    }
   }
 
   // Métodos para el modal de detalle de reserva
