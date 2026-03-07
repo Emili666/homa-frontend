@@ -35,6 +35,7 @@ export class RegisterPageComponent implements OnInit, OnDestroy {
         Validators.pattern(/^(?=.*[0-9])(?=.*[A-Z]).*$/)
       ]],
       confirmPassword: ["", [Validators.required]],
+      telefono: ["", [Validators.required, Validators.pattern(/^[0-9]{10,15}$/)]],
       rol: [RolUsuario.HUESPED, [Validators.required]],
     }, { validators: this.passwordMatchValidator });
   }
@@ -72,10 +73,11 @@ export class RegisterPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const { nombre, email, password, rol } = this.form.value as {
+    const { nombre, email, password, telefono, rol } = this.form.value as {
       nombre: string;
       email: string;
       password: string;
+      telefono: string;
       rol: RolUsuario;
     };
     const selectedRol = rol ?? RolUsuario.HUESPED;
@@ -89,7 +91,7 @@ export class RegisterPageComponent implements OnInit, OnDestroy {
       .register({
         nombre,
         email,
-        telefono: "0000000000",
+        telefono: telefono,
         fechaNacimiento: "2000-01-01",
         contrasena: password,
         rol: this.mapRolToApi(selectedRol),

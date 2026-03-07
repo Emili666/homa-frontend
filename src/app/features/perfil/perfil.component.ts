@@ -660,57 +660,34 @@ export class PerfilComponent implements OnInit, OnDestroy {
       this.isEditMode = false;
     };
 
-    // Si hay una foto seleccionada, usar FormData
+    const formData = new FormData();
     if (this.selectedFile) {
-      const formData = new FormData();
       formData.append('foto', this.selectedFile);
-      formData.append('nombre', this.personalForm.value.nombre);
-      formData.append('email', this.personalForm.value.email);
-      formData.append('telefono', this.personalForm.value.telefono || '');
-
-      this.usuarioService
-        .actualizarPerfilConFoto(formData)
-        .pipe(
-          finalize(() => {
-            this.isSaving = false;
-          }),
-          takeUntil(this.destroy$),
-        )
-        .subscribe({
-          next: (usuario) => {
-            onPerfilActualizado(usuario);
-            this.selectedFile = null;
-            this.previewUrl = null;
-          },
-          error: () => {
-            this.error = "No se pudieron guardar los cambios. Intenta nuevamente.";
-          },
-        });
-    } else {
-      // Sin foto, enviar JSON normal
-      const updatedData: any = {
-        nombre: this.personalForm.value.nombre,
-        email: this.personalForm.value.email,
-        telefono: this.personalForm.value.telefono,
-      };
-
-      this.usuarioService
-        .actualizarPerfil(updatedData)
-        .pipe(
-          finalize(() => {
-            this.isSaving = false;
-          }),
-          takeUntil(this.destroy$),
-        )
-        .subscribe({
-          next: (usuario) => {
-            onPerfilActualizado(usuario);
-          },
-          error: () => {
-            this.error = "No se pudieron guardar los cambios. Intenta nuevamente.";
-          },
-        });
     }
+    formData.append('nombre', this.personalForm.value.nombre);
+    formData.append('email', this.personalForm.value.email);
+    if (this.personalForm.value.telefono) {
+      formData.append('telefono', this.personalForm.value.telefono);
+    }
+
+    this.usuarioService
+      .actualizarPerfilConFoto(formData)
+      .pipe(
+        finalize(() => {
+          this.isSaving = false;
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        next: (usuario) => {
+          onPerfilActualizado(usuario);
+          this.selectedFile = null;
+          this.previewUrl = usuario.foto || null;
+        },
+        error: () => {
+          this.error = "No se pudieron guardar los cambios. Intenta nuevamente.";
+        },
+      });
   }
 
   private patchForms(usuario: Usuario): void {
