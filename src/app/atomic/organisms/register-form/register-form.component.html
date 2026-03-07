@@ -27,7 +27,7 @@
     ></app-form-field>
 
     <!-- Barra de fortaleza de contraseña -->
-    <div *ngIf="getControl('password')?.value" class="mt-2">
+    <div *ngIf="getControlValue('password')" class="mt-2">
       <div class="flex gap-1 h-1.5 mb-1">
         <div class="flex-1 rounded-full transition-colors duration-300"
           [ngClass]="passwordStrength >= 1 ? passwordStrengthBarClass : 'bg-gray-200'"></div>
@@ -45,16 +45,16 @@
 
     <!-- Requisitos de contraseña -->
     <ul class="mt-2 space-y-0.5 text-xs text-gray-500">
-      <li [class.text-green-600]="getControl('password')?.value?.length >= 8">
-        <span class="mr-1">{{ getControl('password')?.value?.length >= 8 ? '✓' : '○' }}</span>
+      <li [class.text-green-600]="passwordHasLength(8)">
+        <span class="mr-1">{{ passwordHasLength(8) ? '✓' : '○' }}</span>
         Al menos 8 caracteres
       </li>
-      <li [class.text-green-600]="/[A-Z]/.test(getControl('password')?.value || '')">
-        <span class="mr-1">{{ /[A-Z]/.test(getControl('password')?.value || '') ? '✓' : '○' }}</span>
+      <li [class.text-green-600]="hasUppercase()">
+        <span class="mr-1">{{ hasUppercase() ? '✓' : '○' }}</span>
         Una letra mayúscula
       </li>
-      <li [class.text-green-600]="/[0-9]/.test(getControl('password')?.value || '')">
-        <span class="mr-1">{{ /[0-9]/.test(getControl('password')?.value || '') ? '✓' : '○' }}</span>
+      <li [class.text-green-600]="hasNumber()">
+        <span class="mr-1">{{ hasNumber() ? '✓' : '○' }}</span>
         Un número
       </li>
     </ul>
@@ -73,15 +73,15 @@
       <label
         *ngFor="let role of roles"
         class="border rounded-xl p-3 cursor-pointer transition hover:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200"
-        [class.border-blue-500]="getControl('rol')?.value === role.value"
-        [class.bg-blue-50]="getControl('rol')?.value === role.value"
+        [class.border-blue-500]="getControlValue('rol') === role.value"
+        [class.bg-blue-50]="getControlValue('rol') === role.value"
       >
         <input
           type="radio"
           class="sr-only"
           formControlName="rol"
           [value]="role.value"
-        />
+        >
         <span class="block text-sm font-semibold text-gray-900">{{ role.label }}</span>
         <span class="block text-xs text-gray-500">{{ role.description }}</span>
       </label>

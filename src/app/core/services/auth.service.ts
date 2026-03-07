@@ -3,7 +3,7 @@ import { HttpClient } from "@angular/common/http"
 import { BehaviorSubject, type Observable, tap } from "rxjs"
 import { Router } from "@angular/router"
 import { environment } from "@environments/environment"
-import { ApiResponse, LoginRequest, LoginResponse, RegistroUsuarioRequest, RolUsuario, Usuario } from "../models/usuario.model"
+import { ApiResponse, EstadoUsuario, LoginRequest, LoginResponse, RegistroUsuarioRequest, RolUsuario, Usuario } from "../models/usuario.model"
 import { ConfigService } from "./config.service"
 
 @Injectable({
@@ -92,24 +92,20 @@ export class AuthService {
     const demoUser: Usuario = {
       id: 0,
       nombre: "Demo",
-      apellido: "Usuario",
       email: "demo@correo.com",
       rol: RolUsuario.HUESPED,
+      estado: EstadoUsuario.ACTIVO,
       telefono: "+57 123 456 7890",
-      direccion: "Carrera 45 #26-85, Bogota",
-      idiomaPreferido: "es",
-      monedaPreferida: "COP",
-      zonaHoraria: "America/Bogota",
-      notificacionesEmail: true,
-      notificacionesPush: true,
-      recibirOfertas: false,
-    } as Usuario
+    };
     const payload: LoginResponse = {
       token: "demo-token",
-      refreshToken: "demo-refresh",
+      tipo: "Bearer",
+      email: demoUser.email,
+      nombre: demoUser.nombre,
+      rol: demoUser.rol,
       usuario: demoUser
-    } as LoginResponse
-    this.setSession(payload)
+    };
+    this.setSession(payload);
   }
 
   fetchCurrentUser(): Observable<Usuario> {
@@ -126,8 +122,10 @@ export class AuthService {
   }
 
   private setSession(authResult: LoginResponse): void {
-    localStorage.setItem(environment.jwtTokenKey, authResult.token)
-    localStorage.setItem(environment.jwtRefreshTokenKey, authResult.refreshToken)
-    this.updateCurrentUser(authResult.usuario)
+    localStorage.setItem(environment.jwtTokenKey, authResult.token);
+    // El backend puede enviar el usuario directamente o en el payload JWT
+    if (authResult.usuario) {
+      this.updateCurrentUser(authResult.usuario);
+    }
   }
 }

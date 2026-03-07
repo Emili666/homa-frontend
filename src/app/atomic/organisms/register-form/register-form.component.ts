@@ -62,4 +62,24 @@ export class RegisterFormComponent {
     const classes = ['', 'bg-red-400', 'bg-orange-400', 'bg-yellow-400', 'bg-green-500'];
     return classes[this.passwordStrength] ?? '';
   }
+
+  // Métodos helper para el template (Angular no soporta /regex/ en templates HTML)
+  passwordHasLength(min: number): boolean {
+    return (this.getControl('password')?.value?.length ?? 0) >= min;
+  }
+
+  hasUppercase(): boolean {
+    const pwd: string = this.getControl('password')?.value ?? '';
+    return /[A-Z]/.test(pwd);
+  }
+
+  hasNumber(): boolean {
+    const pwd: string = this.getControl('password')?.value ?? '';
+    return /[0-9]/.test(pwd);
+  }
+
+  // Valor del control sin usar optional chaining en el template
+  getControlValue(name: string): string {
+    return this.getControl(name)?.value ?? '';
+  }
 }

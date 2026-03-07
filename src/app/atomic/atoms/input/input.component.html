@@ -1,7 +1,7 @@
 <div class="w-full relative">
   <input
     class="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-    [class.border-red-400]="control?.invalid && control?.touched"
+    [class.border-red-400]="control.invalid && control.touched"
     [class.pr-10]="type === 'password'"
     [attr.placeholder]="placeholder"
     [type]="effectiveType"
@@ -19,7 +19,7 @@
   </button>
 
   <!-- Mensajes de error específicos -->
-  <ng-container *ngIf="control?.invalid && control?.touched">
+  <ng-container *ngIf="control.invalid && control.touched">
     <p class="mt-1 text-xs text-red-600" *ngIf="control.errors?.['required']">Este campo es obligatorio.</p>
     <p class="mt-1 text-xs text-red-600" *ngIf="control.errors?.['email']">Ingresa un correo electrónico válido.</p>
     <p class="mt-1 text-xs text-red-600" *ngIf="control.errors?.['minlength']">
