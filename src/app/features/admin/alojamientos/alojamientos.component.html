@@ -80,43 +80,43 @@
           <tr *ngFor="let a of alojamientos" class="hover:bg-gray-50 transition-colors">
             <td class="px-6 py-4">
               <div class="flex items-center">
-                <div class="w-14 h-14 rounded-lg bg-gray-200 overflow-hidden border border-gray-100 mr-4">
-                  <img [src]="a.fotos?.[0] || 'https://via.placeholder.com/150'" class="w-full h-full object-cover" alt="accommodation">
+                <div class="w-14 h-14 rounded-lg bg-gray-200 overflow-hidden border border-gray-100 mr-4 shrink-0">
+                  <img [src]="getImagen(a)" onerror="this.src='https://via.placeholder.com/150'; this.onerror=null;" class="w-full h-full object-cover" alt="accommodation">
                 </div>
                 <div>
-                  <div class="text-sm font-bold text-gray-900">{{ a.nombre }}</div>
-                  <div class="text-xs text-gray-500 flex items-center">
-                    <span class="material-icons text-[10px] mr-1">location_on</span> {{ a.ciudad }}, {{ a.departamento }}
+                  <div class="text-sm font-bold text-gray-900 line-clamp-1" [title]="a.titulo">{{ a.titulo }}</div>
+                  <div class="text-xs text-gray-500 flex items-center mt-1">
+                    <span class="material-icons text-[12px] mr-1 text-gray-400">location_on</span> <span class="truncate block w-32 md:w-48" [title]="a.ciudad + ', ' + a.direccion">{{ a.ciudad }}, {{ a.direccion }}</span>
                   </div>
                 </div>
               </div>
             </td>
             <td class="px-6 py-4">
-              <div class="text-sm text-gray-700 font-medium">{{ a.anfitrionNombre }}</div>
+              <div class="text-sm text-gray-700 font-medium">{{ a.nombreAnfitrion }}</div>
               <div class="text-xs text-gray-400">ID: {{ a.anfitrionId }}</div>
             </td>
             <td class="px-6 py-4">
-              <div class="text-sm text-gray-700 font-bold">{{ a.capacidadMaxima }} Huéspedes</div>
-              <div class="text-xs text-gray-400">{{ a.habitaciones }} Hab - {{ a.camas }} Camas</div>
+              <div class="text-sm text-gray-700 font-bold whitespace-nowrap">{{ a.maxHuespedes }} Huéspedes</div>
+              <div class="text-xs text-gray-500 font-medium mt-1">{{ a.precioPorNoche | currency }} / noche</div>
             </td>
             <td class="px-6 py-4 text-center">
-              <span [class.bg-green-100]="a.estado === 'DISPONIBLE'" 
-                    [class.text-green-800]="a.estado === 'DISPONIBLE'"
-                    [class.bg-red-100]="a.estado !== 'DISPONIBLE'" 
-                    [class.text-red-800]="a.estado !== 'DISPONIBLE'"
+              <span [class.bg-green-100]="a.estado === 'ACTIVO' || a.estado === 'DISPONIBLE'" 
+                    [class.text-green-800]="a.estado === 'ACTIVO' || a.estado === 'DISPONIBLE'"
+                    [class.bg-red-100]="a.estado !== 'ACTIVO' && a.estado !== 'DISPONIBLE'" 
+                    [class.text-red-800]="a.estado !== 'ACTIVO' && a.estado !== 'DISPONIBLE'"
                     class="px-2.5 py-1 text-[10px] font-black rounded-full uppercase tracking-tighter">
                 {{ a.estado }}
               </span>
             </td>
             <td class="px-6 py-4 text-right">
               <div class="flex justify-end gap-2">
-                <button class="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all" title="Ver Detalle">
+                <button (click)="verDetalle(a.id)" class="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all" title="Ver Detalle">
                   <span class="material-icons">visibility</span>
                 </button>
-                <button class="p-2 text-gray-400 hover:text-secondary-600 hover:bg-secondary-50 rounded-lg transition-all" title="Editar">
+                <button (click)="editarAlojamiento(a.id)" class="p-2 text-gray-400 hover:text-secondary-600 hover:bg-secondary-50 rounded-lg transition-all" title="Editar">
                   <span class="material-icons">edit</span>
                 </button>
-                <button class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Eliminar">
+                <button (click)="eliminarAlojamiento(a.id, a.titulo)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Eliminar">
                   <span class="material-icons">delete</span>
                 </button>
               </div>
