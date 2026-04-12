@@ -421,13 +421,28 @@
                   {{ errorReserva }}
                 </div>
 
-                <button
-                  type="submit"
-                  [disabled]="isReservando || reservaForm.invalid"
-                  class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium py-3 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {{ isReservando ? 'Procesando...' : 'Reservar ahora' }}
-                </button>
+                <!-- Botón reservar o checkout MP -->
+                <div *ngIf="!reservaCreada">
+                  <button
+                    type="submit"
+                    [disabled]="isReservando || reservaForm.invalid"
+                    class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium py-3 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {{ isReservando ? 'Procesando...' : 'Reservar ahora' }}
+                  </button>
+                </div>
+
+                <!-- Checkout Mercado Pago (aparece tras crear la reserva) -->
+                <div *ngIf="reservaCreada && precioTotal > 0">
+                  <p class="text-sm text-green-700 font-medium mb-3 text-center">
+                    ✅ Reserva creada. Completa el pago:
+                  </p>
+                  <app-mercadopago-button
+                    [title]="alojamiento!.titulo"
+                    [price]="precioTotal"
+                    [quantity]="1">
+                  </app-mercadopago-button>
+                </div>
               </form>
 
               <p class="mt-4 text-center text-sm text-gray-500">No se cobrará nada por ahora</p>

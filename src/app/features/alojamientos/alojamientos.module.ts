@@ -6,6 +6,7 @@ import { AlojamientosRoutingModule } from './alojamientos-routing.module';
 import { AlojamientosComponent } from './alojamientos.component';
 import { DetalleAlojamientoComponent } from './pages/detalle/detalle.component';
 import { BotonFavoritoComponent } from '../../shared/components/boton-favorito/boton-favorito.component';
+import { MercadoPagoButtonComponent } from '../../shared/components/mercadopago-button/mercadopago-button.component';
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { BotonFavoritoComponent } from '../../shared/components/boton-favorito/b
     FormsModule,
     ReactiveFormsModule,
     AlojamientosRoutingModule,
-    BotonFavoritoComponent
+    BotonFavoritoComponent,
+    MercadoPagoButtonComponent,
   ]
 })
 export class AlojamientosModule { }

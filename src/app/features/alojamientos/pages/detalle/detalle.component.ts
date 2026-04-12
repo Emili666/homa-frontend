@@ -30,6 +30,8 @@ export class DetalleAlojamientoComponent implements OnInit, OnDestroy {
   error?: string;
   successMessage?: string;
   errorReserva?: string;
+  reservaCreada = false;
+  precioTotal = 0;
   minDate: string;
 
   // Reseñas
@@ -330,9 +332,9 @@ export class DetalleAlojamientoComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (reserva) => {
-          // Redirigir a la página de reservas o mostrar confirmación
-          alert('¡Reserva creada exitosamente!');
-          this.router.navigate(['/perfil'], { queryParams: { section: 'misReservas' } });
+          // Mostrar el checkout de Mercado Pago en lugar de redirigir
+          this.reservaCreada = true;
+          this.precioTotal = this.calcularPrecioTotal();
         },
         error: (err) => {
           this.errorReserva = err.error?.message || 'No se pudo crear la reserva. Intenta nuevamente.';
