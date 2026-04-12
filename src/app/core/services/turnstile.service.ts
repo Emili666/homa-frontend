@@ -14,9 +14,16 @@ export class TurnstileService {
      * @param onToken      Callback que recibe el token cuando el user pasa la verificación
      */
     render(containerId: string, onToken: (token: string) => void): void {
-        // Si el script todavía no cargó, reintentar en 500ms
+        // Si el script todavía no cargó, cargarlo dinámicamente
         if (typeof turnstile === 'undefined') {
-            setTimeout(() => this.render(containerId, onToken), 500);
+            this.cargarScript(() => this.render(containerId, onToken));
+            return;
+        }
+
+        // Esperar a que el div exista en el DOM
+        const el = document.getElementById(containerId);
+        if (!el) {
+            setTimeout(() => this.render(containerId, onToken), 200);
             return;
         }
 
@@ -24,17 +31,32 @@ export class TurnstileService {
             sitekey: environment.turnstileSiteKey,
             callback: (token: string) => onToken(token),
             'expired-callback': () => {
-                console.warn('[Turnstile] Token expirado, se requiere interacción nueva.');
+                console.warn('[Turnstile] Token expirado.');
                 onToken('');
             },
             'error-callback': () => {
-                console.error('[Turnstile] Error en el widget de verificación.');
+                console.error('[Turnstile] Error en el widget.');
                 onToken('');
             },
             theme: 'light',
             language: 'es',
             appearance: 'always',
         });
+    }
+
+    private cargarScript(callback: () => void): void {
+        if (document.getElementById('cf-turnstile-script')) {
+            // Script ya existe, esperar a que cargue
+            setTimeout(callback, 500);
+            return;
+        }
+        const script = document.createElement('script');
+        script.id = 'cf-turnstile-script';
+        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+        script.async = true;
+        script.defer = true;
+        script.onload = () => setTimeout(callback, 300);
+        document.head.appendChild(script);
     }
 
     /** Resetea el widget después de un fallo de formulario */

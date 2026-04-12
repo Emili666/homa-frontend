@@ -41,12 +41,12 @@ export class RegisterPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Renderizar el widget Turnstile 500ms después de que Monte el DOM
+    // Esperar a que el DOM esté completamente listo
     setTimeout(() => {
       this.turnstile.render("turnstile-register", (token) => {
         this.turnstileToken = token;
       });
-    }, 500);
+    }, 800);
   }
 
   ngOnDestroy(): void {
