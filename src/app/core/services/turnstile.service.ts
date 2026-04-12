@@ -7,6 +7,7 @@ declare const turnstile: any;
 export class TurnstileService {
 
     private widgetId: string | null = null;
+    private rendered = false;
 
     /**
      * Renderiza el widget Turnstile en el contenedor indicado.
@@ -14,13 +15,13 @@ export class TurnstileService {
      * @param onToken      Callback que recibe el token cuando el user pasa la verificación
      */
     render(containerId: string, onToken: (token: string) => void): void {
-        // Si el script todavía no cargó, cargarlo dinámicamente
+        if (this.rendered) return;
+
         if (typeof turnstile === 'undefined') {
             this.cargarScript(() => this.render(containerId, onToken));
             return;
         }
 
-        // Esperar a que el div exista en el DOM
         const el = document.getElementById(containerId);
         if (!el) {
             console.warn(`[Turnstile] div #${containerId} no encontrado, reintentando...`);
@@ -29,6 +30,7 @@ export class TurnstileService {
         }
 
         console.log(`[Turnstile] Renderizando widget en #${containerId}`);
+        this.rendered = true;
         this.widgetId = turnstile.render(`#${containerId}`, {
             sitekey: environment.turnstileSiteKey,
             callback: (token: string) => onToken(token),
@@ -71,12 +73,9 @@ export class TurnstileService {
     /** Elimina el widget del DOM (llamar en ngOnDestroy) */
     remove(): void {
         if (this.widgetId !== null && typeof turnstile !== 'undefined') {
-            try {
-                turnstile.remove(this.widgetId);
-            } catch (e) {
-                // Widget ya removido
-            }
+            try { turnstile.remove(this.widgetId); } catch (e) {}
             this.widgetId = null;
         }
+        this.rendered = false;
     }
 }
