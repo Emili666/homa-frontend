@@ -133,6 +133,24 @@
     </div>
 </div>
 
+  <!-- Mapa de alojamientos -->
+  <div class="bg-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:text-center mb-8">
+        <h2 class="text-base text-primary-600 font-semibold tracking-wide uppercase">Mapa</h2>
+        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+          Explora alojamientos en el mapa
+        </p>
+        <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+          Encuentra alojamientos cerca de donde quieres ir
+        </p>
+      </div>
+      <div style="height: 500px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+        <app-mapa [altura]="500" [zoom]="6"></app-mapa>
+      </div>
+    </div>
+  </div>
+
   <!-- Testimonios -->
   <div class="bg-gray-50 py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
