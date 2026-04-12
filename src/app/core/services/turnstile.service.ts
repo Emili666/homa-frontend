@@ -33,9 +33,7 @@ export class TurnstileService {
             },
             theme: 'light',
             language: 'es',
-            // "interaction-only" = solo muestra el reto si Cloudflare sospecha bot
-            // Con la clave de testing siempre pasa invisible
-            appearance: 'interaction-only',
+            appearance: 'always',
         });
     }
 
