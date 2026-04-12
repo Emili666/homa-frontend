@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, OnDestroy, AfterViewInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from "@angular/forms";
 import { Router } from "@angular/router";
 import { finalize } from "rxjs/operators";
@@ -12,7 +12,7 @@ import { RolUsuario } from "../../../../core/models/usuario.model";
   templateUrl: "./register.component.html",
   styleUrls: ["./register.component.scss"],
 })
-export class RegisterPageComponent implements OnInit, OnDestroy {
+export class RegisterPageComponent implements OnInit, AfterViewInit, OnDestroy {
   form: FormGroup;
   error?: string;
   successMessage?: string;
@@ -40,13 +40,15 @@ export class RegisterPageComponent implements OnInit, OnDestroy {
     }, { validators: this.passwordMatchValidator });
   }
 
-  ngOnInit(): void {
-    // Esperar a que el DOM esté completamente listo
+  ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
+    // AfterViewInit garantiza que el div #turnstile-register ya existe en el DOM
     setTimeout(() => {
       this.turnstile.render("turnstile-register", (token) => {
         this.turnstileToken = token;
       });
-    }, 800);
+    }, 300);
   }
 
   ngOnDestroy(): void {

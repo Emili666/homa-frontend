@@ -23,10 +23,12 @@ export class TurnstileService {
         // Esperar a que el div exista en el DOM
         const el = document.getElementById(containerId);
         if (!el) {
+            console.warn(`[Turnstile] div #${containerId} no encontrado, reintentando...`);
             setTimeout(() => this.render(containerId, onToken), 200);
             return;
         }
 
+        console.log(`[Turnstile] Renderizando widget en #${containerId}`);
         this.widgetId = turnstile.render(`#${containerId}`, {
             sitekey: environment.turnstileSiteKey,
             callback: (token: string) => onToken(token),
