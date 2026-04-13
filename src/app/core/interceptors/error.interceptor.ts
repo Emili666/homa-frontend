@@ -25,9 +25,7 @@ export class ErrorInterceptor implements HttpInterceptor {
           this.router.navigate(["/"])
         }
 
-        // Retornar el error para que los componentes puedan manejarlo
-        const errorMessage = error.error?.message || error.message || "Error desconocido"
-        return throwError(() => new Error(errorMessage))
+        return throwError(() => error)
       }),
     )
   }
