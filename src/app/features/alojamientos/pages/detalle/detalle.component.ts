@@ -330,9 +330,17 @@ export class DetalleAlojamientoComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (reserva) => {
-          // Redirigir a la página de reservas o mostrar confirmación
-          alert('¡Reserva creada exitosamente!');
-          this.router.navigate(['/perfil'], { queryParams: { section: 'misReservas' } });
+          // Navegar al paso de pago con los datos de la reserva
+          const precioTotal = this.calcularPrecioTotal();
+          const titulo = `Reserva - ${this.alojamiento?.titulo}`;
+          this.router.navigate(['/reservas/pago'], {
+            queryParams: {
+              precio: precioTotal,
+              titulo: titulo,
+              cantidad: 1,
+              reservaId: reserva.id
+            }
+          });
         },
         error: (err) => {
           this.errorReserva = err.error?.message || 'No se pudo crear la reserva. Intenta nuevamente.';

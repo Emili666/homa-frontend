@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { environment } from "@environments/environment";
 
 @Injectable({
   providedIn: "root",
@@ -7,11 +8,10 @@ export class ConfigService {
   private apiUrl: string = "";
 
   constructor() {
-    // Leer de variables de ambiente del navegador
+    // En producción lee la variable inyectada por el servidor (Docker/Azure)
+    // En local usa el environment que apunta al proxy
     const envApiUrl = (window as any).__APP_CONFIG__?.API_URL;
-
-    // Si no hay variable de ambiente, usar valor por defecto
-    this.apiUrl = envApiUrl || "http://localhost:8081/api";
+    this.apiUrl = envApiUrl || environment.apiUrl;
 
     console.log("[ConfigService] API URL: ", this.apiUrl);
   }

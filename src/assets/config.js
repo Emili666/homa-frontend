@@ -1,13 +1,15 @@
 // Configuración dinámica para la aplicación Angular
 // Se ejecuta ANTES de que cargue la app
+// En local: usa /api (proxy de Angular → localhost:8081)
+// En producción (Docker/Azure): el docker-entrypoint.sh sobreescribe este archivo
 
 (function () {
-  // Leer API_URL de variables de ambiente o usar default
-  const apiUrl = window.__APP_CONFIG__?.API_URL || "https://homa-api-bsbmcvc2f7gud3af.canadacentral-01.azurewebsites.net/api";
-
-  // Crear variable global para que Angular la use
   window.__APP_CONFIG__ = window.__APP_CONFIG__ || {};
-  window.__APP_CONFIG__.API_URL = apiUrl;
 
-  console.log("[App Config] Initialized with API URL:", apiUrl);
+  // Solo asignar si no fue inyectado por el servidor (Docker/Azure)
+  if (!window.__APP_CONFIG__.API_URL) {
+    window.__APP_CONFIG__.API_URL = "/api";
+  }
+
+  console.log("[App Config] Initialized with API URL:", window.__APP_CONFIG__.API_URL);
 })();
