@@ -26,6 +26,7 @@ export class BotonFavoritoComponent implements OnInit {
   ngOnInit(): void {
     this.isAuthenticated = this.authService.isAuthenticated
 
+    // Solo verificar favorito si el usuario está autenticado
     if (this.isAuthenticated && this.alojamientoId) {
       this.verificarFavorito()
     }
@@ -37,7 +38,10 @@ export class BotonFavoritoComponent implements OnInit {
         this.esFavorito = result
       },
       error: (err) => {
-        console.error('Error verificando favorito:', err)
+        // Silenciar el error — no es crítico si falla la verificación
+        if (err.status !== 401 && err.status !== 403) {
+          console.error('Error verificando favorito:', err)
+        }
       }
     })
   }

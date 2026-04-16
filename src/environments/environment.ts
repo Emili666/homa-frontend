@@ -3,6 +3,6 @@ export const environment = {
   apiUrl: "/api",  // Usa el proxy local (proxy.conf.json → localhost:8081)
   jwtTokenKey: "homa_auth_token",
   jwtRefreshTokenKey: "homa_refresh_token",
-  // Clave de Turnstile que SIEMPRE pasa (para desarrollo local)
-  turnstileSiteKey: "1x00000000000000000000AA",
+  turnstileSiteKey: "1x00000000000000000000BB",
+  mercadoPagoPublicKey: "TEST-ce741194-c182-4504-ab65-f2d32784bb69",
 };

@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+// Leaflet CSS — OpenStreetMap
+@import 'leaflet/dist/leaflet.css';
+
 
 /*
 $color-primary: #18206F;

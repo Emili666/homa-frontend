@@ -5,12 +5,11 @@
     (submitForm)="onSubmit()"
   ></app-register-form>
 
-  <!-- Widget Cloudflare Turnstile CAPTCHA -->
-  <div class="mt-3 flex flex-col items-center gap-1">
+  <!-- Widget Cloudflare Turnstile CAPTCHA — antes del botón de envío -->
+  <div class="mt-4 flex flex-col items-center gap-1">
     <div id="turnstile-register"></div>
-    <!-- Mensaje si intenta enviar sin completar el captcha -->
     <p *ngIf="error === 'Por favor completa la verificación de seguridad.'"
-       class="text-xs text-gray-500 text-center">
+       class="text-xs text-red-500 text-center">
       🔒 Verifica que no eres un robot para continuar
     </p>
   </div>

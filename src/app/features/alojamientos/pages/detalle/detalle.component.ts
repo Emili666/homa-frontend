@@ -30,6 +30,8 @@ export class DetalleAlojamientoComponent implements OnInit, OnDestroy {
   error?: string;
   successMessage?: string;
   errorReserva?: string;
+  reservaCreada = false;
+  precioTotal = 0;
   minDate: string;
 
   // Reseñas

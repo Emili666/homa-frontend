@@ -3,12 +3,11 @@ import { CommonModule } from "@angular/common"
 import { ReactiveFormsModule, FormsModule } from "@angular/forms"
 import { RouterModule } from "@angular/router"
 import { SidebarComponent } from "./components/sidebar/sidebar.component"
-
-// Componentes compartidos se agregarán aquí
+import { MapaComponent } from "./components/mapa/mapa.component"
 
 @NgModule({
   declarations: [
-    // Componentes compartidos
+    MapaComponent,
   ],
   imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, SidebarComponent],
   exports: [
@@ -16,8 +15,8 @@ import { SidebarComponent } from "./components/sidebar/sidebar.component"
     ReactiveFormsModule,
     FormsModule,
     RouterModule,
-    SidebarComponent
-    // Componentes compartidos
+    SidebarComponent,
+    MapaComponent,
   ],
 })
 export class SharedModule { }

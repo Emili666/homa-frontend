@@ -202,15 +202,9 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   get isAnfitrion(): boolean {
     const user = this.authService.currentUserValue;
-    console.log('Verificando si es anfitrion:', user);
-    if (!user || !user.rol) {
-      console.log('No hay usuario o no tiene rol');
-      return false;
-    }
-    const esAnfitrion = user.rol.toString().toUpperCase() === 'ANFITRION' ||
-      user.rol.toString().toUpperCase() === 'ADMIN';
-    console.log('Es anfitrion?', esAnfitrion, 'Rol:', user.rol);
-    return esAnfitrion;
+    if (!user || !user.rol) return false;
+    const rol = user.rol.toString().toUpperCase();
+    return rol === 'ANFITRION' || rol === 'ADMINISTRADOR';
   }
 
   get currentUser(): Usuario | null {
@@ -325,42 +319,27 @@ export class PerfilComponent implements OnInit, OnDestroy {
   }
 
   setActiveSection(section: string): void {
-    console.log('=== CAMBIANDO SECCION ===');
-    console.log('Nueva seccion:', section);
     this.activeSection = section;
-    console.log('activeSection actualizado:', this.activeSection);
 
-    // Cargar alojamientos cuando se selecciona la sección de Mis Alojamientos
     if (section === 'misAlojamientos' && this.isAnfitrion) {
       this.loadMisAlojamientos();
     }
-
-    // Cargar reservas cuando se selecciona la sección de Mis Reservas
     if (section === 'misReservas') {
       this.loadMisReservas();
     }
-
-    // Cargar reservas del anfitrión cuando se selecciona esa sección
     if (section === 'reservasAnfitrion' && this.isAnfitrion) {
-      console.log('Condicion cumplida: cargando reservas anfitrion');
       this.loadReservasAnfitrion();
     }
-
-    // Cargar favoritos de alojamientos cuando se selecciona esa sección
     if (section === 'favoritosAlojamientos' && this.isAnfitrion) {
-      console.log('Condicion cumplida: cargando favoritos alojamientos');
       this.loadFavoritosAlojamientos();
     }
-
     if (section === 'history') {
       this.loadMisReservas();
-
       if (this.isAnfitrion) {
         this.loadReservasAnfitrion();
         this.loadMisAlojamientos();
       }
     }
-
     if (section === 'settings') {
       this.passwordChangeError = undefined;
       this.passwordChangeSuccess = undefined;
@@ -393,55 +372,42 @@ export class PerfilComponent implements OnInit, OnDestroy {
   }
 
   loadReservasAnfitrion(): void {
-    console.log('=== CARGANDO RESERVAS ANFITRION ===');
     this.isLoadingReservasAnfitrion = true;
     this.error = undefined;
 
     this.reservaService
       .obtenerReservasAnfitrion()
       .pipe(
-        finalize(() => {
-          console.log('Finalizando carga de reservas anfitrion');
-          this.isLoadingReservasAnfitrion = false;
-        }),
+        finalize(() => { this.isLoadingReservasAnfitrion = false; }),
         takeUntil(this.destroy$),
       )
       .subscribe({
         next: (reservas: Reserva[]) => {
-          console.log('Reservas recibidas:', reservas);
-          console.log('Cantidad de reservas:', reservas.length);
           this.reservasAnfitrion = reservas;
           this.cdr.detectChanges();
-          console.log('Change detection forzada. Array actualizado:', this.reservasAnfitrion.length);
         },
         error: (err) => {
-          console.error('ERROR al cargar reservas anfitrion:', err);
-          this.error = "No se pudieron cargar las reservas de tus alojamientos. Intenta nuevamente.";
+          this.error = "No se pudieron cargar las reservas de tus alojamientos.";
         },
       });
   }
 
   loadFavoritosAlojamientos(): void {
-    console.log('=== CARGANDO FAVORITOS DE ALOJAMIENTOS ===');
     this.isLoadingFavoritosAlojamientos = true;
     this.error = undefined;
 
     this.favoritoService
       .obtenerFavoritosDeAlojamientos()
       .pipe(
-        finalize(() => {
-          this.isLoadingFavoritosAlojamientos = false;
-        }),
+        finalize(() => { this.isLoadingFavoritosAlojamientos = false; }),
         takeUntil(this.destroy$),
       )
       .subscribe({
         next: (favoritos) => {
-          console.log('Favoritos recibidos:', favoritos);
           this.favoritosAlojamientos = favoritos;
           this.cdr.detectChanges();
         },
         error: (err) => {
-          console.error('ERROR al cargar favoritos:', err);
           this.error = "No se pudieron cargar los favoritos de tus alojamientos.";
         },
       });
@@ -732,61 +698,46 @@ export class PerfilComponent implements OnInit, OnDestroy {
   }
 
   confirmarReserva(reservaId: number): void {
-    console.log('Confirmando reserva ID:', reservaId);
-
     this.reservaService.confirmar(reservaId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          console.log('Reserva confirmada exitosamente');
-          alert('Reserva confirmada exitosamente');
           this.loadReservasAnfitrion();
           this.cerrarModalReserva();
         },
         error: (err) => {
-          console.error('Error al confirmar reserva:', err);
-          this.error = err.error?.message || 'No se pudo confirmar la reserva. Intenta nuevamente.';
+          this.error = err.error?.message || 'No se pudo confirmar la reserva.';
         }
       });
   }
 
   rechazarReserva(reservaId: number): void {
-    console.log('Rechazando reserva ID:', reservaId);
-
     if (confirm('¿Estás seguro de que deseas rechazar esta reserva?')) {
       this.reservaService.rechazar(reservaId)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
-            console.log('Reserva rechazada exitosamente');
-            alert('Reserva rechazada exitosamente');
             this.loadReservasAnfitrion();
             this.cerrarModalReserva();
           },
           error: (err) => {
-            console.error('Error al rechazar reserva:', err);
-            this.error = err.error?.message || 'No se pudo rechazar la reserva. Intenta nuevamente.';
+            this.error = err.error?.message || 'No se pudo rechazar la reserva.';
           }
         });
     }
   }
 
   completarReserva(reservaId: number): void {
-    console.log('Completando reserva ID:', reservaId);
-
     if (confirm('¿Confirmas que el huésped ya completó su estadía?')) {
       this.reservaService.completar(reservaId)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
-            console.log('Reserva completada exitosamente');
-            alert('Reserva marcada como completada. Ahora el huésped puede dejar una reseña.');
             this.loadReservasAnfitrion();
             this.cerrarModalReserva();
           },
           error: (err) => {
-            console.error('Error al completar reserva:', err);
-            this.error = err.error?.message || 'No se pudo completar la reserva. Intenta nuevamente.';
+            this.error = err.error?.message || 'No se pudo completar la reserva.';
           }
         });
     }

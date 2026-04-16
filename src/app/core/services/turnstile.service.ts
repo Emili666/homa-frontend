@@ -7,6 +7,7 @@ declare const turnstile: any;
 export class TurnstileService {
 
     private widgetId: string | null = null;
+    private rendered = false;
 
     /**
      * Renderiza el widget Turnstile en el contenedor indicado.
@@ -14,29 +15,52 @@ export class TurnstileService {
      * @param onToken      Callback que recibe el token cuando el user pasa la verificación
      */
     render(containerId: string, onToken: (token: string) => void): void {
-        // Si el script todavía no cargó, reintentar en 500ms
+        if (this.rendered) return;
+
         if (typeof turnstile === 'undefined') {
-            setTimeout(() => this.render(containerId, onToken), 500);
+            this.cargarScript(() => this.render(containerId, onToken));
             return;
         }
 
+        const el = document.getElementById(containerId);
+        if (!el) {
+            console.warn(`[Turnstile] div #${containerId} no encontrado, reintentando...`);
+            setTimeout(() => this.render(containerId, onToken), 200);
+            return;
+        }
+
+        console.log(`[Turnstile] Renderizando widget en #${containerId}`);
+        this.rendered = true;
         this.widgetId = turnstile.render(`#${containerId}`, {
             sitekey: environment.turnstileSiteKey,
             callback: (token: string) => onToken(token),
             'expired-callback': () => {
-                console.warn('[Turnstile] Token expirado, se requiere interacción nueva.');
+                console.warn('[Turnstile] Token expirado.');
                 onToken('');
             },
             'error-callback': () => {
-                console.error('[Turnstile] Error en el widget de verificación.');
+                console.error('[Turnstile] Error en el widget.');
                 onToken('');
             },
             theme: 'light',
             language: 'es',
-            // "interaction-only" = solo muestra el reto si Cloudflare sospecha bot
-            // Con la clave de testing siempre pasa invisible
-            appearance: 'interaction-only',
+            appearance: 'always',
         });
+    }
+
+    private cargarScript(callback: () => void): void {
+        if (document.getElementById('cf-turnstile-script')) {
+            // Script ya existe, esperar a que cargue
+            setTimeout(callback, 500);
+            return;
+        }
+        const script = document.createElement('script');
+        script.id = 'cf-turnstile-script';
+        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+        script.async = true;
+        script.defer = true;
+        script.onload = () => setTimeout(callback, 300);
+        document.head.appendChild(script);
     }
 
     /** Resetea el widget después de un fallo de formulario */
@@ -49,12 +73,9 @@ export class TurnstileService {
     /** Elimina el widget del DOM (llamar en ngOnDestroy) */
     remove(): void {
         if (this.widgetId !== null && typeof turnstile !== 'undefined') {
-            try {
-                turnstile.remove(this.widgetId);
-            } catch (e) {
-                // Widget ya removido
-            }
+            try { turnstile.remove(this.widgetId); } catch (e) {}
             this.widgetId = null;
         }
+        this.rendered = false;
     }
 }
