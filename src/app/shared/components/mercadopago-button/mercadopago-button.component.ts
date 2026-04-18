@@ -92,7 +92,7 @@ export class MercadoPagoButtonComponent implements OnInit, OnDestroy {
       bricksBuilder.create('wallet', 'wallet_container_mp', {
         initialization: {
           preferenceId: preferenceId,
-          redirectMode: 'modal'
+          redirectMode: 'self'
         },
         customization: {
           texts: { valueProp: 'smart_option' }
