@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ChangeDetectorRef } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
 import { Subject } from "rxjs";
-import { finalize, takeUntil } from "rxjs/operators";
+import { finalize, switchMap, takeUntil } from "rxjs/operators";
 
 import { AuthService } from "../../core/services/auth.service";
 import { UsuarioService } from "../../core/services/usuario.service";
@@ -10,7 +10,7 @@ import { AlojamientoService, PageResponse } from "../../core/services/alojamient
 import { ReservaService } from "../../core/services/reserva.service";
 import { FavoritoService } from "../../core/services/favorito.service";
 import { Usuario } from "../../core/models/usuario.model";
-import { Alojamiento, EstadoAlojamiento } from "../../core/models/alojamiento.model";
+import { Alojamiento, EstadoAlojamiento, Servicio } from "../../core/models/alojamiento.model";
 import { Reserva } from "../../core/models/reserva.model";
 
 @Component({
@@ -59,6 +59,30 @@ export class PerfilComponent implements OnInit, OnDestroy {
   // Modal de detalle de reserva
   mostrarModalReserva = false;
   reservaSeleccionada: Reserva | null = null;
+
+  // Modal de edición de alojamiento
+  mostrarModalEditarAlojamiento = false;
+  alojamientoEditando: Alojamiento | null = null;
+  editAlojamientoForm!: FormGroup;
+  isEditingAlojamiento = false;
+  editAlojamientoError?: string;
+  // Imágenes existentes (URLs de Cloudinary)
+  imagenesExistentes: string[] = [];
+  imagenesExistentesAEliminar: number[] = [];
+  // Nuevas imágenes seleccionadas del PC
+  imagenesNuevas: File[] = [];
+  imagenesNuevasPreview: string[] = [];
+
+  readonly serviciosDisponibles = [
+    { id: Servicio.WIFI, label: 'WiFi', icon: 'fa-wifi' },
+    { id: Servicio.PISCINA, label: 'Piscina', icon: 'fa-swimming-pool' },
+    { id: Servicio.ESTACIONAMIENTO, label: 'Estacionamiento', icon: 'fa-car' },
+    { id: Servicio.AIRE_ACONDICIONADO, label: 'Aire Acondicionado', icon: 'fa-snowflake' },
+    { id: Servicio.COCINA, label: 'Cocina', icon: 'fa-utensils' },
+    { id: Servicio.MASCOTAS, label: 'Mascotas permitidas', icon: 'fa-paw' },
+    { id: Servicio.TV, label: 'TV', icon: 'fa-tv' },
+    { id: Servicio.LAVADORA, label: 'Lavadora', icon: 'fa-tshirt' },
+  ];
 
   readonly estadoHistorialCliente: Record<string, { title: string; helper: string }> = {
     PENDIENTE: {
@@ -447,6 +471,24 @@ export class PerfilComponent implements OnInit, OnDestroy {
     return this.reservasAnfitrion.filter((reserva) => reserva.estado === 'COMPLETADA').length;
   }
 
+  get gananciasEsteMes(): number {
+    const ahora = new Date();
+    return this.reservasAnfitrion
+      .filter(r => {
+        if (r.estado !== 'COMPLETADA' && r.estado !== 'CONFIRMADA') return false;
+        const fecha = new Date(r.fechaEntrada || r.creadoEn || '');
+        return fecha.getMonth() === ahora.getMonth() && fecha.getFullYear() === ahora.getFullYear();
+      })
+      .reduce((sum, r) => sum + (r.precio || 0), 0);
+  }
+
+  get promedioCalificacion(): number {
+    const alojamientosConCalif = this.misAlojamientos.filter(a => a.calificacionPromedio && a.calificacionPromedio > 0);
+    if (alojamientosConCalif.length === 0) return 0;
+    const suma = alojamientosConCalif.reduce((s, a) => s + a.calificacionPromedio, 0);
+    return Math.round((suma / alojamientosConCalif.length) * 10) / 10;
+  }
+
   getEstadoClienteTitulo(estado: string): string {
     return this.estadoHistorialCliente[estado]?.title || 'Estado de la reserva';
   }
@@ -763,5 +805,116 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   puedeRechazar(reserva: Reserva): boolean {
     return reserva.estado === 'PENDIENTE';
+  }
+
+  // ── Editar Alojamiento ────────────────────────────────────────────────────
+
+  abrirModalEditarAlojamiento(alojamiento: Alojamiento): void {
+    this.alojamientoEditando = alojamiento;
+    this.editAlojamientoError = undefined;
+    this.imagenesExistentes = [...(alojamiento.imagenes || [])];
+    this.imagenesExistentesAEliminar = [];
+    this.imagenesNuevas = [];
+    this.imagenesNuevasPreview = [];
+
+    this.editAlojamientoForm = this.fb.group({
+      titulo: [alojamiento.titulo, [Validators.required, Validators.minLength(10), Validators.maxLength(150)]],
+      descripcion: [alojamiento.descripcion, [Validators.required, Validators.minLength(50), Validators.maxLength(2000)]],
+      ciudad: [alojamiento.ciudad, Validators.required],
+      direccion: [alojamiento.direccion, Validators.required],
+      latitud: [alojamiento.latitud, [Validators.required, Validators.min(-90), Validators.max(90)]],
+      longitud: [alojamiento.longitud, [Validators.required, Validators.min(-180), Validators.max(180)]],
+      precioPorNoche: [alojamiento.precioPorNoche, [Validators.required, Validators.min(0.01)]],
+      maxHuespedes: [alojamiento.maxHuespedes, [Validators.required, Validators.min(1)]],
+      servicios: [alojamiento.servicios || []],
+    });
+
+    this.mostrarModalEditarAlojamiento = true;
+  }
+
+  cerrarModalEditarAlojamiento(): void {
+    this.mostrarModalEditarAlojamiento = false;
+    this.alojamientoEditando = null;
+    this.editAlojamientoError = undefined;
+    this.imagenesNuevas = [];
+    this.imagenesNuevasPreview = [];
+    this.imagenesExistentesAEliminar = [];
+  }
+
+  marcarImagenExistenteParaEliminar(index: number): void {
+    this.imagenesExistentes.splice(index, 1);
+  }
+
+  onFileSelectedEdit(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files) return;
+    const totalActual = this.imagenesExistentes.length + this.imagenesNuevas.length;
+    const disponibles = 10 - totalActual;
+    Array.from(input.files).slice(0, disponibles).forEach(file => {
+      this.imagenesNuevas.push(file);
+      const reader = new FileReader();
+      reader.onload = (e) => this.imagenesNuevasPreview.push(e.target?.result as string);
+      reader.readAsDataURL(file);
+    });
+    input.value = '';
+  }
+
+  eliminarImagenNueva(index: number): void {
+    this.imagenesNuevas.splice(index, 1);
+    this.imagenesNuevasPreview.splice(index, 1);
+  }
+
+  isServicioEditSelected(servicio: Servicio): boolean {
+    const servicios = this.editAlojamientoForm?.get('servicios')?.value as Servicio[] || [];
+    return servicios.includes(servicio);
+  }
+
+  toggleServicioEdit(servicio: Servicio): void {
+    const servicios = this.editAlojamientoForm.get('servicios')?.value as Servicio[] || [];
+    const index = servicios.indexOf(servicio);
+    if (index > -1) {
+      servicios.splice(index, 1);
+    } else {
+      servicios.push(servicio);
+    }
+    this.editAlojamientoForm.patchValue({ servicios });
+  }
+
+  guardarEdicionAlojamiento(): void {
+    if (!this.alojamientoEditando || this.editAlojamientoForm.invalid) {
+      this.editAlojamientoForm.markAllAsTouched();
+      return;
+    }
+
+    const totalImagenes = this.imagenesExistentes.length + this.imagenesNuevas.length;
+    if (totalImagenes === 0) {
+      this.editAlojamientoError = 'Debes tener al menos una imagen.';
+      return;
+    }
+
+    this.isEditingAlojamiento = true;
+    this.editAlojamientoError = undefined;
+
+    const formData = { ...this.editAlojamientoForm.value, imagenes: this.imagenesExistentes };
+    const id = this.alojamientoEditando.id;
+
+    const update$ = this.alojamientoService.actualizar(id, formData);
+
+    const finalObs$ = this.imagenesNuevas.length > 0
+      ? update$.pipe(switchMap(() => this.alojamientoService.subirImagenes(id, this.imagenesNuevas)))
+      : update$;
+
+    finalObs$.pipe(
+      finalize(() => { this.isEditingAlojamiento = false; }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => {
+        this.cerrarModalEditarAlojamiento();
+        this.loadMisAlojamientos();
+      },
+      error: (err) => {
+        this.editAlojamientoError = err?.error?.message || 'No se pudo actualizar el alojamiento.';
+      }
+    });
   }
 }

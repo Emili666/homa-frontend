@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { finalize, takeUntil } from 'rxjs/operators';
+import { finalize, switchMap, takeUntil } from 'rxjs/operators';
 import { AlojamientoService } from '../../core/services/alojamiento.service';
 import { Servicio } from '../../core/models/alojamiento.model';
 
@@ -19,7 +19,10 @@ export class AnfitrionComponent implements OnInit, OnDestroy {
   showSuccessOverlay = false;
   createdAlojamientoTitle = '';
 
-  // Servicios disponibles
+  // Imágenes seleccionadas del PC
+  imagenesSeleccionadas: File[] = [];
+  imagenesPreview: string[] = [];
+
   serviciosDisponibles = [
     { id: Servicio.WIFI, label: 'WiFi', icon: 'fa-wifi' },
     { id: Servicio.PISCINA, label: 'Piscina', icon: 'fa-swimming-pool' },
@@ -47,7 +50,6 @@ export class AnfitrionComponent implements OnInit, OnDestroy {
       longitud: [null, [Validators.required, Validators.min(-180), Validators.max(180)]],
       precioPorNoche: [null, [Validators.required, Validators.min(0.01)]],
       maxHuespedes: [1, [Validators.required, Validators.min(1)]],
-      imagenes: this.fb.array([], [Validators.required, Validators.minLength(1)]),
       servicios: [[]]
     });
   }
@@ -59,30 +61,39 @@ export class AnfitrionComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  get imagenes(): FormArray {
-    return this.alojamientoForm.get('imagenes') as FormArray;
+  // ── Manejo de imágenes desde el PC ────────────────────────────────────────
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files) return;
+
+    const nuevos = Array.from(input.files);
+    const disponibles = 10 - this.imagenesSeleccionadas.length;
+    nuevos.slice(0, disponibles).forEach(file => {
+      this.imagenesSeleccionadas.push(file);
+      const reader = new FileReader();
+      reader.onload = (e) => this.imagenesPreview.push(e.target?.result as string);
+      reader.readAsDataURL(file);
+    });
+
+    input.value = ''; // Permite seleccionar el mismo archivo de nuevo
   }
 
-  agregarImagen(): void {
-    if (this.imagenes.length < 10) {
-      this.imagenes.push(this.fb.control('', Validators.required));
-    }
+  eliminarImagenSeleccionada(index: number): void {
+    this.imagenesSeleccionadas.splice(index, 1);
+    this.imagenesPreview.splice(index, 1);
   }
 
-  eliminarImagen(index: number): void {
-    this.imagenes.removeAt(index);
-  }
+  // ── Servicios ─────────────────────────────────────────────────────────────
 
   toggleServicio(servicio: Servicio): void {
     const servicios = this.alojamientoForm.get('servicios')?.value as Servicio[] || [];
     const index = servicios.indexOf(servicio);
-
     if (index > -1) {
       servicios.splice(index, 1);
     } else {
       servicios.push(servicio);
     }
-
     this.alojamientoForm.patchValue({ servicios });
   }
 
@@ -91,75 +102,66 @@ export class AnfitrionComponent implements OnInit, OnDestroy {
     return servicios.includes(servicio);
   }
 
+  // ── Submit: crear alojamiento y luego subir imágenes ──────────────────────
+
   onSubmit(): void {
     if (this.alojamientoForm.invalid) {
       Object.keys(this.alojamientoForm.controls).forEach(key => {
-        const control = this.alojamientoForm.get(key);
-        if (control?.invalid) {
-          control.markAsTouched();
-        }
+        this.alojamientoForm.get(key)?.markAsTouched();
       });
       this.error = 'Por favor completa todos los campos requeridos correctamente';
       return;
     }
 
+    if (this.imagenesSeleccionadas.length === 0) {
+      this.error = 'Debes seleccionar al menos una imagen';
+      return;
+    }
+
     this.isSubmitting = true;
     this.error = undefined;
-    this.successMessage = undefined;
 
-    const formData = this.alojamientoForm.value;
+    // Paso 1: crear alojamiento con imagenes vacías
+    const formData = { ...this.alojamientoForm.value, imagenes: [] };
 
-    this.alojamientoService
-      .crear(formData)
-      .pipe(
-        finalize(() => {
-          this.isSubmitting = false;
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (alojamiento) => {
-          this.successMessage = 'Alojamiento creado exitosamente';
-          this.createdAlojamientoTitle = alojamiento?.titulo || this.alojamientoForm.get('titulo')?.value || '';
-          this.showSuccessOverlay = true;
-        },
-        error: (err) => {
-          this.error = err.error?.message || 'No se pudo crear el alojamiento. Intenta nuevamente.';
-        }
-      });
+    this.alojamientoService.crear(formData).pipe(
+      switchMap(alojamiento =>
+        // Paso 2: subir imágenes al alojamiento creado
+        this.alojamientoService.subirImagenes(alojamiento.id, this.imagenesSeleccionadas)
+      ),
+      finalize(() => { this.isSubmitting = false; }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => {
+        this.createdAlojamientoTitle = this.alojamientoForm.get('titulo')?.value || '';
+        this.showSuccessOverlay = true;
+      },
+      error: (err) => {
+        this.error = err.error?.message || 'No se pudo crear el alojamiento. Intenta nuevamente.';
+      }
+    });
   }
 
   irAMisAlojamientos(): void {
-    this.router.navigate(['/perfil'], {
-      queryParams: { section: 'misAlojamientos' }
-    });
+    this.router.navigate(['/perfil'], { queryParams: { section: 'misAlojamientos' } });
   }
 
   crearOtroAlojamiento(): void {
     this.showSuccessOverlay = false;
-    this.successMessage = undefined;
-    this.createdAlojamientoTitle = '';
     this.error = undefined;
+    this.createdAlojamientoTitle = '';
+    this.imagenesSeleccionadas = [];
+    this.imagenesPreview = [];
     this.alojamientoForm.reset({
-      titulo: '',
-      descripcion: '',
-      ciudad: '',
-      direccion: '',
-      latitud: null,
-      longitud: null,
-      precioPorNoche: null,
-      maxHuespedes: 1,
-      servicios: []
+      titulo: '', descripcion: '', ciudad: '', direccion: '',
+      latitud: null, longitud: null, precioPorNoche: null,
+      maxHuespedes: 1, servicios: []
     });
-    this.imagenes.clear();
-    this.agregarImagen();
     this.alojamientoForm.markAsPristine();
     this.alojamientoForm.markAsUntouched();
   }
 
   cancel(): void {
-    this.router.navigate(['/perfil'], {
-      queryParams: { section: 'misAlojamientos' }
-    });
+    this.router.navigate(['/perfil'], { queryParams: { section: 'misAlojamientos' } });
   }
 }

@@ -22,7 +22,6 @@ export class AlojamientoService {
 
   buscar(params: BusquedaAlojamientoParams): Observable<PageResponse<Alojamiento>> {
     let httpParams = new HttpParams()
-
     if (params.ciudad) httpParams = httpParams.set("ciudad", params.ciudad)
     if (params.fechaInicio) httpParams = httpParams.set("fechaInicio", params.fechaInicio)
     if (params.fechaFin) httpParams = httpParams.set("fechaFin", params.fechaFin)
@@ -31,7 +30,6 @@ export class AlojamientoService {
     if (params.capacidad) httpParams = httpParams.set("capacidad", params.capacidad.toString())
     if (params.page !== undefined) httpParams = httpParams.set("page", params.page.toString())
     if (params.size !== undefined) httpParams = httpParams.set("size", params.size.toString())
-
     return this.http.get<PageResponse<Alojamiento>>(`${this.apiUrl}/buscar`, { params: httpParams })
   }
 
@@ -66,9 +64,10 @@ export class AlojamientoService {
     return this.http.get<PageResponse<Alojamiento>>(this.apiUrl, { params })
   }
 
-  subirImagen(id: number, imagen: File): Observable<string> {
+  // Sube múltiples imágenes a Cloudinary via backend
+  subirImagenes(id: number, imagenes: File[]): Observable<void> {
     const formData = new FormData()
-    formData.append("imagen", imagen)
-    return this.http.post<string>(`${this.apiUrl}/${id}/imagenes`, formData)
+    imagenes.forEach(img => formData.append('imagenes', img))
+    return this.http.post<void>(`${this.apiUrl}/${id}/imagenes`, formData)
   }
 }

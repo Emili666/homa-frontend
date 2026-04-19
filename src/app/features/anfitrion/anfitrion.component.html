@@ -203,35 +203,36 @@
     <!-- Imágenes -->
     <section class="form-section">
       <h2><i class="fas fa-images"></i> Imágenes <span class="required">*</span></h2>
-      <p class="section-description">Agrega entre 1 y 10 URLs de imágenes de tu alojamiento</p>
+      <p class="section-description">Selecciona entre 1 y 10 imágenes desde tu computador</p>
 
-      <div class="imagenes-container" formArrayName="imagenes">
-        <div *ngFor="let imagen of imagenes.controls; let i = index" class="imagen-row">
-          <input
-            [formControlName]="i"
-            type="url"
-            class="form-control"
-            [class.invalid]="imagen.invalid && imagen.touched"
-            placeholder="https://ejemplo.com/imagen.jpg"
-          />
-          <button type="button" class="btn-delete" (click)="eliminarImagen(i)">
-            <i class="fas fa-trash"></i>
+      <!-- Previews de imágenes seleccionadas -->
+      <div class="imagenes-preview-grid" *ngIf="imagenesPreview.length > 0">
+        <div *ngFor="let preview of imagenesPreview; let i = index" class="imagen-preview-item">
+          <img [src]="preview" alt="Preview imagen {{i+1}}" />
+          <button type="button" class="btn-delete-preview" (click)="eliminarImagenSeleccionada(i)">
+            <i class="fas fa-times"></i>
           </button>
         </div>
       </div>
 
-      <button
-        type="button"
-        class="btn-add-imagen"
-        (click)="agregarImagen()"
-        [disabled]="imagenes.length >= 10"
-      >
-        <i class="fas fa-plus"></i>
-        Agregar imagen
-      </button>
+      <!-- Botón para abrir el selector de archivos -->
+      <label class="btn-add-imagen" [class.disabled]="imagenesSeleccionadas.length >= 10">
+        <i class="fas fa-upload"></i>
+        {{ imagenesSeleccionadas.length === 0 ? 'Seleccionar imágenes' : 'Agregar más imágenes' }}
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          (change)="onFileSelected($event)"
+          [disabled]="imagenesSeleccionadas.length >= 10"
+          style="display:none"
+        />
+      </label>
 
-      <small class="error-message" *ngIf="imagenes.length === 0 && alojamientoForm.get('imagenes')?.touched">
-        Debes agregar al menos una imagen
+      <small class="form-hint">{{ imagenesSeleccionadas.length }}/10 imágenes seleccionadas. Máximo 5MB por imagen.</small>
+
+      <small class="error-message" *ngIf="imagenesSeleccionadas.length === 0 && isSubmitting">
+        Debes seleccionar al menos una imagen
       </small>
     </section>
 

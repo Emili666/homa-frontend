@@ -208,15 +208,15 @@
         <div class="stats-grid">
           <div class="stat-card">
             <p class="stat-label">Ganancias este mes</p>
-            <h2 class="stat-value">$2,450</h2>
+            <h2 class="stat-value">${{ gananciasEsteMes | number }}</h2>
           </div>
           <div class="stat-card">
             <p class="stat-label">Reservas activas</p>
-            <h2 class="stat-value">12</h2>
+            <h2 class="stat-value">{{ totalReservasHostActivas }}</h2>
           </div>
           <div class="stat-card">
             <p class="stat-label">Calificación promedio</p>
-            <h2 class="stat-value">4.8 <i class="fas fa-star"></i></h2>
+            <h2 class="stat-value">{{ promedioCalificacion > 0 ? promedioCalificacion : 'Sin datos' }} <i *ngIf="promedioCalificacion > 0" class="fas fa-star"></i></h2>
           </div>
         </div>
 
@@ -264,6 +264,13 @@
               </div>
               <div class="listing-actions">
                 <button class="btn-link" [routerLink]="['/alojamientos', alojamiento.id]">Ver</button>
+                <button
+                  class="btn-link btn-link-edit"
+                  type="button"
+                  (click)="abrirModalEditarAlojamiento(alojamiento)"
+                >
+                  Editar
+                </button>
                 <button
                   class="btn-link btn-link-danger"
                   type="button"
@@ -794,7 +801,144 @@
   </main>
 </div>
 
-<!-- Modal Detalle de Reserva -->
+<!-- Modal Editar Alojamiento -->
+<div *ngIf="mostrarModalEditarAlojamiento" class="modal-overlay" (click)="cerrarModalEditarAlojamiento()">
+  <div class="modal-content modal-content--large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2><i class="fas fa-edit"></i> Editar Alojamiento</h2>
+      <button class="btn-close" (click)="cerrarModalEditarAlojamiento()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="editAlojamientoForm">
+      <form [formGroup]="editAlojamientoForm" (ngSubmit)="guardarEdicionAlojamiento()">
+
+        <!-- Información básica -->
+        <div class="edit-form-grid">
+          <div class="form-group full-width">
+            <label>Título *</label>
+            <input type="text" formControlName="titulo" class="form-control" placeholder="Título del alojamiento" />
+            <small class="error-message" *ngIf="editAlojamientoForm.get('titulo')?.invalid && editAlojamientoForm.get('titulo')?.touched">
+              Mínimo 10 caracteres, máximo 150.
+            </small>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Descripción *</label>
+            <textarea formControlName="descripcion" class="form-control" rows="4" placeholder="Describe tu alojamiento..."></textarea>
+            <small class="error-message" *ngIf="editAlojamientoForm.get('descripcion')?.invalid && editAlojamientoForm.get('descripcion')?.touched">
+              Mínimo 50 caracteres, máximo 2000.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label>Ciudad *</label>
+            <input type="text" formControlName="ciudad" class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <label>Dirección *</label>
+            <input type="text" formControlName="direccion" class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <label>Latitud *</label>
+            <input type="number" formControlName="latitud" class="form-control" step="any" />
+          </div>
+
+          <div class="form-group">
+            <label>Longitud *</label>
+            <input type="number" formControlName="longitud" class="form-control" step="any" />
+          </div>
+
+          <div class="form-group">
+            <label>Precio por noche (COP) *</label>
+            <input type="number" formControlName="precioPorNoche" class="form-control" min="0.01" />
+          </div>
+
+          <div class="form-group">
+            <label>Máx. huéspedes *</label>
+            <input type="number" formControlName="maxHuespedes" class="form-control" min="1" />
+          </div>
+        </div>
+
+        <!-- Servicios -->
+        <div class="form-group full-width" style="margin-top: 1rem;">
+          <label>Servicios</label>
+          <div class="servicios-grid">
+            <button
+              *ngFor="let s of serviciosDisponibles"
+              type="button"
+              class="servicio-btn"
+              [class.selected]="isServicioEditSelected(s.id)"
+              (click)="toggleServicioEdit(s.id)"
+            >
+              <i class="fas {{ s.icon }}"></i> {{ s.label }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Imágenes existentes -->
+        <div class="form-group full-width" style="margin-top: 1rem;">
+          <label>Imágenes actuales</label>
+          <div class="imagenes-preview-grid" *ngIf="imagenesExistentes.length > 0">
+            <div *ngFor="let url of imagenesExistentes; let i = index" class="imagen-preview-item">
+              <img [src]="url" alt="Imagen {{i+1}}" />
+              <button type="button" class="btn-delete-preview" (click)="marcarImagenExistenteParaEliminar(i)">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <p *ngIf="imagenesExistentes.length === 0" class="form-hint">No hay imágenes actuales.</p>
+        </div>
+
+        <!-- Agregar nuevas imágenes -->
+        <div class="form-group full-width" style="margin-top: 0.5rem;">
+          <label>Agregar nuevas imágenes</label>
+          <div class="imagenes-preview-grid" *ngIf="imagenesNuevasPreview.length > 0">
+            <div *ngFor="let preview of imagenesNuevasPreview; let i = index" class="imagen-preview-item">
+              <img [src]="preview" alt="Nueva imagen {{i+1}}" />
+              <button type="button" class="btn-delete-preview" (click)="eliminarImagenNueva(i)">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <label class="btn-add-imagen" [class.disabled]="(imagenesExistentes.length + imagenesNuevas.length) >= 10">
+            <i class="fas fa-upload"></i>
+            Seleccionar imágenes
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              (change)="onFileSelectedEdit($event)"
+              [disabled]="(imagenesExistentes.length + imagenesNuevas.length) >= 10"
+              style="display:none"
+            />
+          </label>
+          <small class="form-hint">{{ imagenesExistentes.length + imagenesNuevas.length }}/10 imágenes. Máx. 5MB por imagen.</small>
+        </div>
+
+        <div *ngIf="editAlojamientoError" class="error-message" style="margin-top: 1rem;">
+          {{ editAlojamientoError }}
+        </div>
+
+        <div class="modal-footer" style="margin-top: 1.5rem; padding: 0;">
+          <button type="button" class="btn-secondary" (click)="cerrarModalEditarAlojamiento()" [disabled]="isEditingAlojamiento">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-success" [disabled]="isEditingAlojamiento || editAlojamientoForm.invalid">
+            <i class="fas fa-spinner fa-spin" *ngIf="isEditingAlojamiento"></i>
+            <i class="fas fa-save" *ngIf="!isEditingAlojamiento"></i>
+            {{ isEditingAlojamiento ? 'Guardando...' : 'Guardar cambios' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
 <div *ngIf="mostrarModalReserva" class="modal-overlay" (click)="cerrarModalReserva()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
