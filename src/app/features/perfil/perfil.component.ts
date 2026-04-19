@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ChangeDetectorRef } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
-import { Subject } from "rxjs";
+import { Subject, of } from "rxjs";
 import { finalize, switchMap, takeUntil } from "rxjs/operators";
 
 import { AuthService } from "../../core/services/auth.service";
@@ -897,14 +897,15 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
     const formData = { ...this.editAlojamientoForm.value, imagenes: this.imagenesExistentes };
     const id = this.alojamientoEditando.id;
+    const imagenesNuevas = [...this.imagenesNuevas];
 
-    const update$ = this.alojamientoService.actualizar(id, formData);
-
-    const finalObs$ = this.imagenesNuevas.length > 0
-      ? update$.pipe(switchMap(() => this.alojamientoService.subirImagenes(id, this.imagenesNuevas)))
-      : update$;
-
-    finalObs$.pipe(
+    this.alojamientoService.actualizar(id, formData).pipe(
+      switchMap(() => {
+        if (imagenesNuevas.length > 0) {
+          return this.alojamientoService.subirImagenes(id, imagenesNuevas);
+        }
+        return of(null);
+      }),
       finalize(() => { this.isEditingAlojamiento = false; }),
       takeUntil(this.destroy$)
     ).subscribe({
@@ -912,7 +913,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
         this.cerrarModalEditarAlojamiento();
         this.loadMisAlojamientos();
       },
-      error: (err) => {
+      error: (err: any) => {
         this.editAlojamientoError = err?.error?.message || 'No se pudo actualizar el alojamiento.';
       }
     });
