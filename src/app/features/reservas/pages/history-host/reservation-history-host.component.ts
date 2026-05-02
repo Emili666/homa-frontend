@@ -11,11 +11,13 @@ export class ReservationHistoryHostComponent implements OnInit {
   reservas: Reserva[] = []
   isLoading = false
   error?: string
+  accionando: number | null = null
 
   readonly estadoEtiquetas: Record<string, { label: string; classes: string }> = {
-    PENDIENTE: { label: "Pendiente", classes: "bg-amber-100 text-amber-800" },
+    PENDIENTE_CONFIRMACION: { label: "Pendiente", classes: "bg-amber-100 text-amber-800" },
     CONFIRMADA: { label: "Confirmada", classes: "bg-emerald-100 text-emerald-700" },
-    CANCELADA: { label: "Cancelada", classes: "bg-rose-100 text-rose-700" },
+    RECHAZADA: { label: "Rechazada", classes: "bg-rose-100 text-rose-700" },
+    CANCELADA: { label: "Cancelada", classes: "bg-slate-100 text-slate-600" },
     COMPLETADA: { label: "Completada", classes: "bg-blue-100 text-blue-700" },
   }
 
@@ -48,6 +50,45 @@ export class ReservationHistoryHostComponent implements OnInit {
 
   getEstadoLabel(estado: string): string {
     return this.estadoEtiquetas[estado]?.label || estado
+  }
+
+  esPendiente(reserva: Reserva): boolean {
+    return reserva.estado === 'PENDIENTE_CONFIRMACION'
+  }
+
+  esConfirmada(reserva: Reserva): boolean {
+    return reserva.estado === 'CONFIRMADA'
+  }
+
+  confirmar(reserva: Reserva): void {
+    this.accionando = reserva.id
+    this.error = undefined
+    this.reservaService.confirmar(reserva.id).subscribe({
+      next: () => {
+        this.accionando = null
+        this.cargarHistorial()
+      },
+      error: (err) => {
+        this.accionando = null
+        this.error = err?.error?.message || "No se pudo confirmar la reserva."
+      },
+    })
+  }
+
+  rechazar(reserva: Reserva): void {
+    if (!confirm("¿Seguro que deseas rechazar esta reserva? El pago será gestionado según las políticas de la plataforma.")) return
+    this.accionando = reserva.id
+    this.error = undefined
+    this.reservaService.rechazar(reserva.id).subscribe({
+      next: () => {
+        this.accionando = null
+        this.cargarHistorial()
+      },
+      error: (err) => {
+        this.accionando = null
+        this.error = err?.error?.message || "No se pudo rechazar la reserva."
+      },
+    })
   }
 
   trackByReservaId(_index: number, reserva: Reserva): number {

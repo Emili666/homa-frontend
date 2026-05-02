@@ -85,13 +85,17 @@ export class PerfilComponent implements OnInit, OnDestroy {
   ];
 
   readonly estadoHistorialCliente: Record<string, { title: string; helper: string }> = {
-    PENDIENTE: {
-      title: "Esperando confirmacion",
-      helper: "Te avisaremos cuando el anfitrion responda.",
+    PENDIENTE_CONFIRMACION: {
+      title: "Esperando confirmación",
+      helper: "El anfitrión revisará tu solicitud. Te avisaremos cuando responda.",
     },
     CONFIRMADA: {
       title: "Reserva confirmada",
       helper: "Prepara tu viaje y revisa los detalles clave.",
+    },
+    RECHAZADA: {
+      title: "Reserva rechazada",
+      helper: "El anfitrión no pudo aceptar tu solicitud. El pago será gestionado según las políticas de la plataforma.",
     },
     CANCELADA: {
       title: "Reserva cancelada",
@@ -104,9 +108,10 @@ export class PerfilComponent implements OnInit, OnDestroy {
   };
 
   readonly estadoHistorialHost: Record<string, { label: string; classes: string }> = {
-    PENDIENTE: { label: "Pendiente", classes: "status-pill status-pill--pending" },
+    PENDIENTE_CONFIRMACION: { label: "Pendiente", classes: "status-pill status-pill--pending" },
     CONFIRMADA: { label: "Confirmada", classes: "status-pill status-pill--info" },
-    CANCELADA: { label: "Cancelada", classes: "status-pill status-pill--danger" },
+    RECHAZADA: { label: "Rechazada", classes: "status-pill status-pill--danger" },
+    CANCELADA: { label: "Cancelada", classes: "status-pill status-pill--neutral" },
     COMPLETADA: { label: "Completada", classes: "status-pill status-pill--success" },
   };
 
@@ -453,7 +458,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   get totalReservasClienteActivas(): number {
     return this.misReservas.filter(
-      (reserva) => reserva.estado === 'PENDIENTE' || reserva.estado === 'CONFIRMADA',
+      (reserva) => reserva.estado === 'PENDIENTE_CONFIRMACION' || reserva.estado === 'CONFIRMADA',
     ).length;
   }
 
@@ -463,7 +468,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   get totalReservasHostActivas(): number {
     return this.reservasAnfitrion.filter(
-      (reserva) => reserva.estado === 'PENDIENTE' || reserva.estado === 'CONFIRMADA',
+      (reserva) => reserva.estado === 'PENDIENTE_CONFIRMACION' || reserva.estado === 'CONFIRMADA',
     ).length;
   }
 
@@ -787,16 +792,17 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
   getEstadoBadgeClass(estado: string): string {
     const clases: { [key: string]: string } = {
-      'PENDIENTE': 'bg-yellow-100 text-yellow-800',
+      'PENDIENTE_CONFIRMACION': 'bg-amber-100 text-amber-800',
       'CONFIRMADA': 'bg-blue-100 text-blue-800',
       'COMPLETADA': 'bg-green-100 text-green-800',
-      'CANCELADA': 'bg-red-100 text-red-800'
+      'RECHAZADA': 'bg-rose-100 text-rose-800',
+      'CANCELADA': 'bg-slate-100 text-slate-600',
     };
     return clases[estado] || 'bg-gray-100 text-gray-800';
   }
 
   puedeConfirmar(reserva: Reserva): boolean {
-    return reserva.estado === 'PENDIENTE';
+    return reserva.estado === 'PENDIENTE_CONFIRMACION';
   }
 
   puedeCompletar(reserva: Reserva): boolean {
@@ -804,7 +810,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
   }
 
   puedeRechazar(reserva: Reserva): boolean {
-    return reserva.estado === 'PENDIENTE';
+    return reserva.estado === 'PENDIENTE_CONFIRMACION';
   }
 
   // ── Editar Alojamiento ────────────────────────────────────────────────────

@@ -76,4 +76,28 @@
   &__link {
     @apply inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-700;
   }
+
+  &__actions {
+    @apply bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3;
+  }
+
+  &__actions-hint {
+    @apply text-sm text-amber-700 flex items-center gap-2;
+  }
+
+  &__actions-buttons {
+    @apply flex flex-wrap gap-3;
+  }
+
+  &__btn {
+    @apply inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed;
+
+    &--confirm {
+      @apply bg-emerald-600 text-white hover:bg-emerald-700;
+    }
+
+    &--reject {
+      @apply bg-white text-rose-600 border border-rose-300 hover:bg-rose-50;
+    }
+  }
 }

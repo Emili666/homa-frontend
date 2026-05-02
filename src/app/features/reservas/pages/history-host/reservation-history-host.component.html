@@ -2,9 +2,9 @@
   <header class="history-card__header">
     <div>
       <p class="history-card__eyebrow">Panel de anfitrión</p>
-      <h1 class="history-card__title">Historial de reservas de mis alojamientos</h1>
+      <h1 class="history-card__title">Solicitudes de reserva</h1>
       <p class="history-card__subtitle">
-        Consulta el estado de cada reserva, confirma llegadas y haz seguimiento al desempeño de tus propiedades.
+        Revisa las solicitudes recibidas y confirma o rechaza cada una según tu disponibilidad.
       </p>
     </div>
     <button type="button" class="history-card__refresh" (click)="cargarHistorial()">
@@ -64,12 +64,37 @@
         </div>
       </div>
 
+      <!-- Acciones solo para reservas pendientes de confirmación -->
+      <div *ngIf="esPendiente(reserva)" class="history-card__actions">
+        <p class="history-card__actions-hint">
+          <i class="fas fa-circle-info"></i>
+          El huésped ya realizó el pago. Confirma o rechaza esta solicitud.
+        </p>
+        <div class="history-card__actions-buttons">
+          <button
+            type="button"
+            class="history-card__btn history-card__btn--confirm"
+            [disabled]="accionando === reserva.id"
+            (click)="confirmar(reserva)"
+          >
+            <i class="fas fa-check" *ngIf="accionando !== reserva.id"></i>
+            <i class="fas fa-spinner fa-spin" *ngIf="accionando === reserva.id"></i>
+            Confirmar reserva
+          </button>
+          <button
+            type="button"
+            class="history-card__btn history-card__btn--reject"
+            [disabled]="accionando === reserva.id"
+            (click)="rechazar(reserva)"
+          >
+            <i class="fas fa-xmark"></i>
+            Rechazar
+          </button>
+        </div>
+      </div>
+
       <footer class="history-card__footer">
         <span>Creada el {{ reserva.creadoEn | date: 'medium' }}</span>
-        <button type="button" class="history-card__link">
-          Ver detalle completo
-          <i class="fas fa-arrow-up-right-from-square"></i>
-        </button>
       </footer>
     </article>
   </div>
