@@ -952,11 +952,11 @@
       <!-- Estado de la reserva -->
       <div class="estado-badge-container">
         <span class="badge-large"
-              [class.badge-pendiente]="reservaSeleccionada.estado === 'PENDIENTE'"
+              [class.badge-pendiente]="reservaSeleccionada.estado === 'PENDIENTE_CONFIRMACION'"
               [class.badge-confirmada]="reservaSeleccionada.estado === 'CONFIRMADA'"
-              [class.badge-cancelada]="reservaSeleccionada.estado === 'CANCELADA'"
+              [class.badge-cancelada]="reservaSeleccionada.estado === 'CANCELADA' || reservaSeleccionada.estado === 'RECHAZADA'"
               [class.badge-completada]="reservaSeleccionada.estado === 'COMPLETADA'">
-          {{ reservaSeleccionada.estado }}
+          {{ getEstadoHostLabel(reservaSeleccionada.estado) }}
         </span>
       </div>
 
@@ -1024,12 +1024,12 @@
 
     <div class="modal-footer">
       <button class="btn-secondary" (click)="cerrarModalReserva()">Cerrar</button>
-      <button *ngIf="reservaSeleccionada?.estado === 'PENDIENTE'"
+      <button *ngIf="reservaSeleccionada?.estado === 'PENDIENTE_CONFIRMACION'"
               class="btn-success"
               (click)="confirmarReserva(reservaSeleccionada!.id)">
         <i class="fas fa-check"></i> Confirmar Reserva
       </button>
-      <button *ngIf="reservaSeleccionada?.estado === 'PENDIENTE'"
+      <button *ngIf="reservaSeleccionada?.estado === 'PENDIENTE_CONFIRMACION'"
               class="btn-danger"
               (click)="rechazarReserva(reservaSeleccionada!.id)">
         <i class="fas fa-times"></i> Rechazar
