@@ -14,7 +14,7 @@ export class ReservationHistoryHostComponent implements OnInit {
   accionando: number | null = null
 
   readonly estadoEtiquetas: Record<string, { label: string; classes: string }> = {
-    PENDIENTE_CONFIRMACION: { label: "Pendiente", classes: "bg-amber-100 text-amber-800" },
+    PENDIENTE: { label: "Pendiente", classes: "bg-amber-100 text-amber-800" },
     CONFIRMADA: { label: "Confirmada", classes: "bg-emerald-100 text-emerald-700" },
     RECHAZADA: { label: "Rechazada", classes: "bg-rose-100 text-rose-700" },
     CANCELADA: { label: "Cancelada", classes: "bg-slate-100 text-slate-600" },
@@ -53,7 +53,7 @@ export class ReservationHistoryHostComponent implements OnInit {
   }
 
   esPendiente(reserva: Reserva): boolean {
-    return reserva.estado === 'PENDIENTE_CONFIRMACION'
+    return reserva.estado === 'PENDIENTE'
   }
 
   esConfirmada(reserva: Reserva): boolean {

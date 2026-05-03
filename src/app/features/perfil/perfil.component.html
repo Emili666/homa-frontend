@@ -342,11 +342,11 @@
             <div class="reserva-header">
               <h3>{{ reserva.tituloAlojamiento }}</h3>
               <span class="badge"
-                    [class.badge-pendiente]="reserva.estado === 'PENDIENTE_CONFIRMACION'"
+                    [class.badge-pendiente]="reserva.estado === 'PENDIENTE'"
                     [class.badge-confirmada]="reserva.estado === 'CONFIRMADA'"
                     [class.badge-cancelada]="reserva.estado === 'CANCELADA' || reserva.estado === 'RECHAZADA'"
                     [class.badge-completada]="reserva.estado === 'COMPLETADA'">
-                {{ reserva.estado === 'PENDIENTE_CONFIRMACION' ? 'Pendiente' : reserva.estado | titlecase }}
+                {{ reserva.estado === 'PENDIENTE' ? 'Pendiente' : reserva.estado | titlecase }}
               </span>
             </div>
             <div class="reserva-info">
@@ -369,7 +369,7 @@
             </div>
             <div class="reserva-actions">
               <button class="btn-link" [routerLink]="['/alojamientos', reserva.alojamientoId]">Ver Alojamiento</button>
-              <button *ngIf="reserva.estado === 'PENDIENTE_CONFIRMACION' || reserva.estado === 'CONFIRMADA'"
+              <button *ngIf="reserva.estado === 'PENDIENTE' || reserva.estado === 'CONFIRMADA'"
                       class="btn-cancel">
                 Cancelar Reserva
               </button>
@@ -952,7 +952,7 @@
       <!-- Estado de la reserva -->
       <div class="estado-badge-container">
         <span class="badge-large"
-              [class.badge-pendiente]="reservaSeleccionada.estado === 'PENDIENTE_CONFIRMACION'"
+              [class.badge-pendiente]="reservaSeleccionada.estado === 'PENDIENTE'"
               [class.badge-confirmada]="reservaSeleccionada.estado === 'CONFIRMADA'"
               [class.badge-cancelada]="reservaSeleccionada.estado === 'CANCELADA' || reservaSeleccionada.estado === 'RECHAZADA'"
               [class.badge-completada]="reservaSeleccionada.estado === 'COMPLETADA'">

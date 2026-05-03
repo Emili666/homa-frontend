@@ -13,9 +13,9 @@ export class ReservationHistoryClientComponent implements OnInit {
   error?: string
 
   readonly estadoMensajes: Record<string, { title: string; helper: string }> = {
-    PENDIENTE_CONFIRMACION: { title: "Esperando confirmación", helper: "El anfitrión revisará tu solicitud. Te avisaremos cuando responda." },
+    PENDIENTE: { title: "Esperando confirmación", helper: "El anfitrión revisará tu solicitud. Te avisaremos cuando responda." },
     CONFIRMADA: { title: "Reserva confirmada", helper: "Prepárate para el viaje, te esperamos." },
-    RECHAZADA: { title: "Reserva rechazada", helper: "El anfitrión no pudo aceptar tu solicitud. El pago será gestionado según las políticas de la plataforma." },
+    RECHAZADA: { title: "Reserva rechazada", helper: "El anfitrión no pudo aceptar tu solicitud." },
     CANCELADA: { title: "Reserva cancelada", helper: "Si fue un error, intenta reservar otra vez." },
     COMPLETADA: { title: "Experiencia completada", helper: "Deja una reseña y ayuda a otros viajeros." },
   }
