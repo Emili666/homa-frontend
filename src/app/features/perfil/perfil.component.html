@@ -1024,12 +1024,12 @@
 
     <div class="modal-footer">
       <button class="btn-secondary" (click)="cerrarModalReserva()">Cerrar</button>
-      <button *ngIf="reservaSeleccionada?.estado === 'PENDIENTE_CONFIRMACION'"
+      <button *ngIf="reservaSeleccionada?.estado === 'PENDIENTE'"
               class="btn-success"
               (click)="confirmarReserva(reservaSeleccionada!.id)">
         <i class="fas fa-check"></i> Confirmar Reserva
       </button>
-      <button *ngIf="reservaSeleccionada?.estado === 'PENDIENTE_CONFIRMACION'"
+      <button *ngIf="reservaSeleccionada?.estado === 'PENDIENTE'"
               class="btn-danger"
               (click)="rechazarReserva(reservaSeleccionada!.id)">
         <i class="fas fa-times"></i> Rechazar
