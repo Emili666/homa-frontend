@@ -1,134 +1,83 @@
-# HomaFrontend
+# HOMA — Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.5.
+Cliente web en **Angular 17** para HOMA, una plataforma de alquiler de alojamientos estilo Airbnb. Consume la API de [`homa-backend`](https://github.com/Emili666/homa-backend) y permite a clientes reservar alojamientos y a anfitriones publicarlos y gestionarlos.
 
-## Development server
+## Funcionalidades por módulo
 
-To start a local development server, run:
+- **Auth**: registro, login, activación de cuenta por correo, recuperación de contraseña.
+- **Alojamientos**: búsqueda, listado, detalle, mapa interactivo con Leaflet.
+- **Reservas**: creación de reservas, vista de "mis reservas" (cliente) y gestión de reservas recibidas (anfitrión).
+- **Anfitrión**: panel para publicar y administrar alojamientos, imágenes, y responder reseñas.
+- **Perfil**: edición de datos de usuario y cambio de contraseña.
+- **Admin**: panel de administración (gestión de usuarios y reservas).
+- **Home**: landing pública con alojamientos destacados.
+
+## Stack técnico
+
+| Categoría | Tecnología |
+|---|---|
+| Framework | Angular 17 |
+| Mapas | Leaflet |
+| Estilos | Tailwind CSS |
+| HTTP / Estado | RxJS, interceptores (JWT, manejo de errores) |
+| Guards | Auth guard, Role guard |
+| Servidor de producción | Express (`azure-server.js`) detrás de Nginx |
+| Contenedores | Docker |
+
+## Arquitectura del proyecto
+
+El código sigue una organización por **features** (módulos de negocio) más una capa de **diseño atómico** para componentes reutilizables:
+
+```
+src/app/
+├── atomic/       # Design system: atoms (button, input, label), molecules, organisms, templates
+├── core/         # Guards, interceptors, modelos, servicios transversales
+├── features/     # Módulos de negocio: auth, home, alojamientos, reservas, anfitrion, perfil, admin, activar-cuenta
+├── layouts/      # Layouts de la aplicación
+└── shared/       # Componentes y utilidades compartidas
+```
+
+Esta separación entre `atomic` (componentes visuales puros) y `features` (lógica de cada sección) facilita mantener y probar la interfaz sin acoplar diseño con reglas de negocio.
+
+## Cómo correrlo localmente
+
+### Requisitos
+- Node.js 18+
+- El backend de HOMA corriendo (ver [`homa-backend`](https://github.com/Emili666/homa-backend)) o apuntado a un entorno desplegado.
+
+### Pasos
 
 ```bash
+npm install
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+La aplicación queda disponible en `http://localhost:4200/` y recarga automáticamente al modificar el código.
 
-## Code scaffolding
+Configura la URL del backend en `public/config.js` o mediante el proxy (`proxy.conf.json`) según el entorno.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+### Build de producción
 
 ```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Los artefactos quedan en `dist/`.
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Con Docker
 
 ```bash
-ng test
+docker build -t homa-frontend .
+docker run -p 4200:80 homa-frontend
 ```
 
-## Running end-to-end tests
+## Documentación adicional
 
-For end-to-end (e2e) testing, run:
+El repositorio incluye documentación específica por área:
+- `DOCS_GENERAL.md` — visión general del frontend.
+- `DOCS_ADMIN_PANEL.md` — panel de administración.
+- `DOCS_METRICS.md` / `CALIDAD_Y_METRICAS.md` — métricas y calidad de código.
 
-```bash
-ng e2e
-```
+## Proyecto relacionado
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
-# HOMA Frontend - Angular
-
-Frontend de la aplicación HOMA (Gestión de Alojamientos) desarrollado con Angular 17.
-
-## Requisitos Previos
-
-- Node.js 18+ y npm
-- Angular CLI 17+
-
-## Instalación
-
-\`\`\`bash
-cd frontend
-npm install
-\`\`\`
-
-## Desarrollo
-
-\`\`\`bash
-# Iniciar servidor de desarrollo
-npm start
-
-# La aplicación estará disponible en http://localhost:4200
-\`\`\`
-
-## Construcción
-
-\`\`\`bash
-# Build de producción
-npm run build
-
-# Los archivos se generarán en dist/homa-frontend
-\`\`\`
-
-## Pruebas
-
-\`\`\`bash
-# Ejecutar pruebas unitarias
-npm test
-
-# Ejecutar pruebas con cobertura
-npm run test:coverage
-\`\`\`
-
-## Estructura del Proyecto
-
-\`\`\`
-frontend/
-├── src/
-│   ├── app/
-│   │   ├── core/              # Servicios, guards, interceptores
-│   │   ├── shared/            # Componentes compartidos
-│   │   ├── features/          # Módulos de funcionalidades
-│   │   └── app.module.ts
-│   ├── assets/                # Imágenes, iconos, etc.
-│   ├── environments/          # Configuración de ambientes
-│   └── styles.scss            # Estilos globales
-└── angular.json
-\`\`\`
-
-## Conexión con Backend
-
-El frontend se conecta al backend Spring Boot en:
-- **Desarrollo**: http://localhost:8080/api
-- **Producción**: https://api.homa.edu.co/api
-
-Configurar en `src/environments/environment.ts`
-
-## Paleta de Colores HOMA
-
-- **Primary**: #18206F (Azul Marino)
-- **Secondary**: #17255A (Azul Profundo)
-- **Action**: #BD1E1E (Rojo Intenso)
-- **Neutral**: #F5E2C8 (Crema Cálido)
-- **Accent**: #D88373 (Coral Suave)
+Este frontend consume la API de [`homa-backend`](https://github.com/Emili666/homa-backend), construido en Spring Boot.
